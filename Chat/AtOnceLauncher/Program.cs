@@ -35,8 +35,6 @@ At Once Launcher
             var clientExecutable = Directory.GetFiles(clientProjectPath, "Client.exe", SearchOption.AllDirectories);
 
             var serverProcess = Process.Start(serverExecutable[0]);
-
-            while (true) ;
         }
     }
 }
