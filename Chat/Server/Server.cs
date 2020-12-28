@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System;
+using System.Threading;
 
 namespace Server
 {
@@ -14,9 +15,9 @@ namespace Server
             m_ServerGui.Initialize();
             try
             {
-                
+
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 //TODO : Logger
             }
@@ -41,6 +42,13 @@ namespace Server
                 else
                 {
                     break;
+                }
+
+                var updateConsumedTime = m_Timer.ElapsedMilliseconds - elapsedTimeMSec;
+                var sleepTime = timeSlicePerUpdate - updateConsumedTime;
+                if (sleepTime > 0)
+                {
+                    Thread.Sleep((int)sleepTime);
                 }
             }
         }
