@@ -7,7 +7,7 @@ using Veldrid;
 using System.Runtime.CompilerServices;
 using ImGuiNET;
 
-namespace Server
+namespace Server.Gui
 {
     /// <summary>
     /// A modified version of Veldrid.ImGui's ImGuiRenderer.

@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Veldrid;
 
-namespace Server
+namespace Server.Util
 {
     public static class GuiUtil
     {

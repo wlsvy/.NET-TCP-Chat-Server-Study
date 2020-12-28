@@ -3,8 +3,9 @@ using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 using System;
 using ImGuiNET;
+using Server.Util;
 
-namespace Server
+namespace Server.Gui
 {
     public sealed class ServerGui : IDisposable
     {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 namespace Server
 {
@@ -10,10 +9,10 @@ namespace Server
         {
             Console.WriteLine("=========================== \n \t Run Server! \n===========================");
 
-            using (var server = new Server())
+            using (var server = new Core.Server())
             {
                 server.Initialize();
-                server.RunLoop(TIME_SLICE_PER_UPDATE_MSEC);
+                server.RunMainThreadLoop(TIME_SLICE_PER_UPDATE_MSEC);
             }
 
             Console.WriteLine("=========================== \n \t Server Terminated! \n===========================");
