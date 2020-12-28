@@ -22,7 +22,8 @@ At Once Launcher Start
                 directory = directory.Parent;
             }
 
-            if(directory.Name != ROOT_DIRECTORY_NAME)
+            if (directory == null ||
+                directory.Name != ROOT_DIRECTORY_NAME)
             {
                 Console.WriteLine("프로젝트 루트 폴더를 찾지 못했습니다. 프로그램을 종료합니다.");
                 return;
@@ -39,6 +40,13 @@ At Once Launcher Start
             Console.WriteLine(
     @"===============================
 Launched All Executables!!!
+===============================");
+
+            serverProcess.WaitForExit();
+
+            Console.WriteLine(
+@"===============================
+At Once Launcher Terminated
 ===============================");
         }
     }
