@@ -12,7 +12,7 @@ namespace AtOnceLauncher
         {
             Console.WriteLine(
                 @"===============================
-At Once Launcher
+At Once Launcher Start
 ===============================");
 
             var directory = Directory.GetParent(Directory.GetCurrentDirectory());
@@ -35,6 +35,11 @@ At Once Launcher
             var clientExecutable = Directory.GetFiles(clientProjectPath, "Client.exe", SearchOption.AllDirectories);
 
             var serverProcess = Process.Start(serverExecutable[0]);
+
+            Console.WriteLine(
+    @"===============================
+Launched All Executables!!!
+===============================");
         }
     }
 }
