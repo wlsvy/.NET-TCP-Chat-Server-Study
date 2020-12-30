@@ -4,10 +4,11 @@ using Veldrid.StartupUtilities;
 using System;
 using ImGuiNET;
 using Server.Util;
+using Server.Logger;
 
 namespace Server.Gui
 {
-    public sealed class ServerGui : IDisposable
+    public sealed class VeldridWindow : IDisposable
     {
         public bool IsWindowExist
         {
@@ -28,28 +29,37 @@ namespace Server.Gui
 
         private bool m_IsDisposed = false;
 
-        public void Initialize()
+        public void Open()
         {
-            VeldridStartup.CreateWindowAndGraphicsDevice(
+            try
+            {
+                VeldridStartup.CreateWindowAndGraphicsDevice(
                 new WindowCreateInfo(
-                    (int)GuiUtil.WINDOW_INTIAL_POSITION.X, 
-                    (int)GuiUtil.WINDOW_INTIAL_POSITION.Y, 
-                    (int)GuiUtil.WINDOW_INITAL_SIZE.X, 
-                    (int)GuiUtil.WINDOW_INITAL_SIZE.Y, 
-                    WindowState.Normal, 
+                    (int)GuiUtil.WINDOW_INTIAL_POSITION.X,
+                    (int)GuiUtil.WINDOW_INTIAL_POSITION.Y,
+                    (int)GuiUtil.WINDOW_INITAL_SIZE.X,
+                    (int)GuiUtil.WINDOW_INITAL_SIZE.Y,
+                    WindowState.Normal,
                     "ImGui.NET Sample Program"),
                 new GraphicsDeviceOptions(true, null, true, ResourceBindingModel.Improved, true, true),
                 out m_Window,
                 out m_GraphicsDevice);
 
-            m_Window.Resized += OnWindowResize;
+                m_Window.Resized += OnWindowResize;
 
-            m_CommandList = m_GraphicsDevice.ResourceFactory.CreateCommandList();
-            m_ImguiManager = new ImguiManager(
-                m_GraphicsDevice,
-                m_GraphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
-                m_Window.Width,
-                m_Window.Height);
+                m_CommandList = m_GraphicsDevice.ResourceFactory.CreateCommandList();
+                m_ImguiManager = new ImguiManager(
+                    m_GraphicsDevice,
+                    m_GraphicsDevice.MainSwapchain.Framebuffer.OutputDescription,
+                    m_Window.Width,
+                    m_Window.Height);
+            }
+            catch(Exception e)
+            {
+                Log.I.Error("Veldrid Window 열기 실패");
+                Dispose();
+            }
+            
         }
 
         public void Update(int deltaMSec)
@@ -57,6 +67,7 @@ namespace Server.Gui
             OnRenderBegin(deltaMSec);
 
             ImGui.Begin("Hello World");
+            ImGui.End();
             ImGui.ShowDemoWindow();
 
             Submit();

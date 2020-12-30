@@ -8,7 +8,7 @@ namespace Server.Core
 {
     public sealed class Server : IDisposable
     {
-        private ServerGui m_ServerGui = new ServerGui();
+        private VeldridWindow m_GuiWindow = new VeldridWindow();
         private Stopwatch m_Timer = new Stopwatch();
 
         private bool m_IsDisposed = false;
@@ -20,7 +20,7 @@ namespace Server.Core
 
             try
             {
-                m_ServerGui.Initialize();
+                m_GuiWindow.Open();
             }
             catch (Exception e)
             {
@@ -28,7 +28,7 @@ namespace Server.Core
             }
         }
 
-        public void RunMainThreadLoop(int timeSlicePerUpdate)
+        public void RunLoop(int timeSlicePerUpdate)
         {
             m_Timer.Start();
             long elapsedTimeMSec = 0;
@@ -40,9 +40,9 @@ namespace Server.Core
                 var deltaTimeMSec = currentElapsedTime - elapsedTimeMSec;
                 elapsedTimeMSec = currentElapsedTime;
 
-                if (m_ServerGui.IsWindowExist)
+                if (m_GuiWindow.IsWindowExist)
                 {
-                    m_ServerGui.Update((int)deltaTimeMSec);
+                    m_GuiWindow.Update((int)deltaTimeMSec);
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace Server.Core
                 return;
             }
 
-            m_ServerGui.Dispose();
+            m_GuiWindow.Dispose();
 
             DestroySingleton();
 
