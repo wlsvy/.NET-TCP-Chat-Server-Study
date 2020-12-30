@@ -10,6 +10,7 @@ namespace Server.Core
     {
         private VeldridWindow m_GuiWindow = new VeldridWindow();
         private Stopwatch m_Timer = new Stopwatch();
+        private ServerConfig config;
 
         private bool m_IsDisposed = false;
 
@@ -28,7 +29,7 @@ namespace Server.Core
             }
         }
 
-        public void RunLoop(int timeSlicePerUpdate)
+        public void RunMainThreadLoop(int timeSlicePerUpdate)
         {
             m_Timer.Start();
             long elapsedTimeMSec = 0;

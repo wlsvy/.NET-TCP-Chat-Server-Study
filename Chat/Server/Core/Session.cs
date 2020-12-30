@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Core
 {
-    class Session
+    public sealed class Session
     {
+        public readonly long SessionId;
+
     }
 }

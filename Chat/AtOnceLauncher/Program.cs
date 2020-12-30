@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics;
+using System.Text.Json;
+using Server.Core;
 
 namespace AtOnceLauncher
 {
@@ -15,17 +17,10 @@ namespace AtOnceLauncher
 At Once Launcher Start
 ===============================");
 
-            var directory = Directory.GetParent(Directory.GetCurrentDirectory());
-            while (directory != null &&
-                directory.Name != ROOT_DIRECTORY_NAME)
+            var directory = FindRootDirectory();
+            if(directory == null)
             {
-                directory = directory.Parent;
-            }
-
-            if (directory == null ||
-                directory.Name != ROOT_DIRECTORY_NAME)
-            {
-                Console.WriteLine("프로젝트 루트 폴더를 찾지 못했습니다. 프로그램을 종료합니다.");
+                Console.WriteLine($"{nameof(AtOnceLauncher)}  프로젝트 루트 폴더를 찾지 못했습니다. 프로그램을 종료합니다.");
                 return;
             }
 
@@ -48,6 +43,24 @@ Launched All Executables!!!
 @"===============================
 At Once Launcher Terminated
 ===============================");
+        }
+
+        private static DirectoryInfo FindRootDirectory()
+        {
+            var directory = Directory.GetParent(Directory.GetCurrentDirectory());
+            while (directory != null &&
+                directory.Name != ROOT_DIRECTORY_NAME)
+            {
+                directory = directory.Parent;
+            }
+
+            if (directory == null ||
+                directory.Name != ROOT_DIRECTORY_NAME)
+            {
+                return null;
+            }
+
+            return directory;
         }
     }
 }

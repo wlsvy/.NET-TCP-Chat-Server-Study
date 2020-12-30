@@ -21,5 +21,11 @@
     <EmbeddedResource Include="../Resources/Shaders/Metal/imgui-vertex.metallib" LogicalName="imgui-vertex.metallib" />
     <EmbeddedResource Include="../Resources/Shaders/Metal/imgui-frag.metallib" LogicalName="imgui-frag.metallib" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="ServerConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>
