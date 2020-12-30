@@ -8,11 +8,16 @@ namespace Server.Core
 {
     public sealed class Server : IDisposable
     {
+        private readonly ServerConfig m_Config;
         private VeldridWindow m_GuiWindow = new VeldridWindow();
         private Stopwatch m_Timer = new Stopwatch();
-        private ServerConfig config;
 
         private bool m_IsDisposed = false;
+
+        public Server(ServerConfig config)
+        {
+            m_Config = config;
+        }
 
         public void Initialize()
         {
@@ -29,7 +34,7 @@ namespace Server.Core
             }
         }
 
-        public void RunMainThreadLoop(int timeSlicePerUpdate)
+        public void RunMainThreadLoop()
         {
             m_Timer.Start();
             long elapsedTimeMSec = 0;
@@ -51,7 +56,7 @@ namespace Server.Core
                 }
 
                 var updateConsumedTime = m_Timer.ElapsedMilliseconds - elapsedTimeMSec;
-                var sleepTime = timeSlicePerUpdate - updateConsumedTime;
+                var sleepTime = m_Config.TimeSlicePerUpdateMSec - updateConsumedTime;
                 if (sleepTime > 0)
                 {
                     Thread.Sleep((int)sleepTime);

@@ -9,17 +9,16 @@ namespace Server
 {
     static class Program
     {
-        public const int TIME_SLICE_PER_UPDATE_MSEC = 30;
         private static void Main(string[] args)
         {
             Console.WriteLine("=========================== \n \t Run Server! \n===========================");
 
             var config = LoadServerConfig();
 
-            using (var server = new Core.Server())
+            using (var server = new Core.Server(config))
             {
                 server.Initialize();
-                server.RunMainThreadLoop(TIME_SLICE_PER_UPDATE_MSEC);
+                server.RunMainThreadLoop();
             }
 
             Console.WriteLine("=========================== \n \t Server Terminated! \n===========================");
