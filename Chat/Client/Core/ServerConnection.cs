@@ -80,6 +80,11 @@ namespace Client.Core
             args.Dispose();
         }
 
+        private class ConnectionContext
+        {
+
+        }
+
         public void Connect()
         {
 
