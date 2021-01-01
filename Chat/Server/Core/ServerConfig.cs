@@ -11,6 +11,6 @@ namespace Server.Core
         public string CSListenIPAddress { get; set; }
         public int CSListenPort { get; set; }
         public int TimeSlicePerUpdateMSec { get; set; }
-
+        public int NumberOfCSBacklogSockets { get; set; }
     }
 }
