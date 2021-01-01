@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat", "Chat\Chat.csproj", "{6BB86C1F-66F8-4E74-8DCB-2CA687C0AC15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat", "Chat\Chat.csproj", "{6BB86C1F-66F8-4E74-8DCB-2CA687C0AC15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{C902FCFB-0496-42B5-B963-B44B8C441A36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{C902FCFB-0496-42B5-B963-B44B8C441A36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtOnceLauncher", "AtOnceLauncher\AtOnceLauncher.csproj", "{855DF397-669F-4090-B63B-2B0BBD8D1E5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AtOnceLauncher", "AtOnceLauncher\AtOnceLauncher.csproj", "{855DF397-669F-4090-B63B-2B0BBD8D1E5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{AFE932FF-97C7-4C06-9BD3-774B52125301}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{AFE932FF-97C7-4C06-9BD3-774B52125301}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{2C557A47-1215-4727-A78A-3B06FF0CABB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{AFE932FF-97C7-4C06-9BD3-774B52125301}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFE932FF-97C7-4C06-9BD3-774B52125301}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFE932FF-97C7-4C06-9BD3-774B52125301}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C557A47-1215-4727-A78A-3B06FF0CABB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C557A47-1215-4727-A78A-3B06FF0CABB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C557A47-1215-4727-A78A-3B06FF0CABB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C557A47-1215-4727-A78A-3B06FF0CABB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

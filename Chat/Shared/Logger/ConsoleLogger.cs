@@ -1,7 +1,7 @@
-﻿using Server.Interface;
+﻿using Shared.Interface;
 using System;
 
-namespace Server.Logger
+namespace Shared.Logger
 {
     public class ConsoleLogger : ILogger
     {

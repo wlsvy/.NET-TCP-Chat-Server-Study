@@ -2,7 +2,7 @@
 using System;
 using System.Threading;
 using Server.Gui;
-using Server.Logger;
+using Shared.Logger;
 
 namespace Server.Core
 {

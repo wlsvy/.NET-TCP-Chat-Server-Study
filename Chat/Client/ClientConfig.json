@@ -1,0 +1,5 @@
+{
+  "ServerIPAddress": "123.0.0.1",
+  "ServerPort": 10000,
+  "TimeSlicePerUpdateMSec": 30
+}

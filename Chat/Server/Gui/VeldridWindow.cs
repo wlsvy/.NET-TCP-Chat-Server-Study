@@ -3,8 +3,8 @@ using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 using System;
 using ImGuiNET;
-using Server.Util;
-using Server.Logger;
+using Shared.Util;
+using Shared.Logger;
 
 namespace Server.Gui
 {

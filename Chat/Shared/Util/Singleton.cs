@@ -1,4 +1,4 @@
-﻿namespace Server.Util
+﻿namespace Shared.Util
 {
     public class Singleton<T> where T : class, new()
     {

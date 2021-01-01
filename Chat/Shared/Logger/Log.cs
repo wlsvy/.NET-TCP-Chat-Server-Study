@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Server.Interface;
-using Server.Util;
+using Shared.Interface;
+using Shared.Util;
 
-namespace Server.Logger
+namespace Shared.Logger
 {
     public class Log : Singleton<Log>, ILogger
     {

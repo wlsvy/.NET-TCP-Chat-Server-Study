@@ -9,7 +9,10 @@
     <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
   
   <ItemGroup>
     <EmbeddedResource Include="../Resources/Shaders/GLSL/imgui-vertex.glsl" LogicalName="imgui-vertex.glsl" />
