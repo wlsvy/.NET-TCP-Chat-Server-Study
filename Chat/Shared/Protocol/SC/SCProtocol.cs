@@ -8,5 +8,6 @@ namespace Shared.Protocol.SC
 {
     public enum SCProtocol
     {
+        Invalid,
     }
 }

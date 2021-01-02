@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Protocol.CS
 {
-    class CSPacketSender
+    public sealed class CSPacketSender
     {
     }
 }

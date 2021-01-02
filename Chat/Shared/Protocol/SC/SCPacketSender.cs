@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Protocol.SC
 {
-    public class SCPacketSender
+    public sealed class SCPacketSender
     {
     }
 }

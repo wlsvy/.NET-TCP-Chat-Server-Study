@@ -8,5 +8,6 @@ namespace Shared.Protocol.CS
 {
     public enum CSProtocol
     {
+        Invalid,
     }
 }
