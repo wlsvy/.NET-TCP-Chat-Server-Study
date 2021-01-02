@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System;
 using System.Threading;
+using System.Net;
 using Server.Gui;
 using Shared.Logger;
 
@@ -12,11 +13,16 @@ namespace Server.Core
         private VeldridWindow m_GuiWindow = new VeldridWindow();
         private Stopwatch m_Timer = new Stopwatch();
 
+        private readonly ClientConnectionManager m_ClientConnectionManager;
+        private readonly SessionManager m_SessionManager;
+
         private bool m_IsDisposed = false;
 
         public Server(ServerConfig config)
         {
             m_Config = config;
+            m_ClientConnectionManager = new ClientConnectionManager();
+            m_SessionManager = new SessionManager();
         }
 
         public void Initialize()
@@ -81,6 +87,11 @@ namespace Server.Core
         private void InitializeSingleton()
         {
             Log.I.Initialize();
+        }
+
+        private void Start()
+        {
+            var ipAddress = IPAddress.Parse(m_Config.CSListenIPAddress);
         }
 
         private void DestroySingleton()
