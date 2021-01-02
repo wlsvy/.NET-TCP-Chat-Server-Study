@@ -7,5 +7,10 @@ namespace Server.Core
     {
         public readonly long SessionId;
 
+
+        public void OnDisconnected()
+        {
+
+        }
     }
 }
