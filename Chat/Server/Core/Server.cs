@@ -10,9 +10,8 @@ namespace Server.Core
     public sealed class Server : IDisposable
     {
         private readonly ServerConfig m_Config;
-        private VeldridWindow m_GuiWindow = new VeldridWindow();
-        private Stopwatch m_Timer = new Stopwatch();
-
+        private readonly VeldridWindow m_GuiWindow;
+        private readonly Stopwatch m_Timer;
         private readonly ClientConnectionManager m_ClientConnectionManager;
         private readonly SessionManager m_SessionManager;
 
@@ -21,6 +20,8 @@ namespace Server.Core
         public Server(ServerConfig config)
         {
             m_Config = config;
+            m_GuiWindow = new VeldridWindow();
+            m_Timer = new Stopwatch();
             m_ClientConnectionManager = new ClientConnectionManager(m_SessionManager);
             m_SessionManager = new SessionManager();
         }
