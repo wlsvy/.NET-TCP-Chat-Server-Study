@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Net;
 using System.Net.Sockets;
 using Shared.Protocol.SC;
-using Shared.Logger;
 
 namespace Server.Core
 {

@@ -2,15 +2,15 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
+using Shared.Network;
 using Shared.Util;
 
 namespace Server.Core
 {
     public sealed class ClientConnectionManager : IDisposable
     {
-        private readonly AsyncTCPAcceptor m_Acceptor;
+        private readonly AsyncTcpAcceptor m_Acceptor;
         private readonly SessionManager m_SessionManager;
         private readonly ConcurrentDictionary<long, ClientConnection> m_Connections;
         private readonly IdGenerator m_ClientConnectionIdGenerator;
@@ -19,7 +19,7 @@ namespace Server.Core
 
         public ClientConnectionManager(SessionManager sessionManager)
         {
-            m_Acceptor = new AsyncTCPAcceptor(OnNewConnection);
+            m_Acceptor = new AsyncTcpAcceptor(OnNewConnection);
             m_SessionManager = sessionManager;
             m_Connections = new ConcurrentDictionary<long, ClientConnection>();
             m_ClientConnectionIdGenerator = new IdGenerator();

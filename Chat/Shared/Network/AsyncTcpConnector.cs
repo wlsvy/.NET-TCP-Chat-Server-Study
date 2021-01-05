@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Client.Core
+namespace Shared.Network
 {
-    public static class AsyncTCPConnector
+    public static class AsyncTcpConnector
     {
         public static void TryConnect(IPAddress ip, int port, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket, object> onCompleted)
         {

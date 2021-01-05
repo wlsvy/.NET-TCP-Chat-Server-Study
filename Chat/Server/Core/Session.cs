@@ -24,7 +24,7 @@ namespace Server.Core
             m_IsDisposed = true;
         }
 
-        private void OnDisconnected()
+        public void OnDisconnected()
         {
 
         }

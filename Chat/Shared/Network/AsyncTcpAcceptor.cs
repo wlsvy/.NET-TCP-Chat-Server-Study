@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using Shared.Logger;
 
-namespace Server.Core
+namespace Shared.Network
 {
-    public class AsyncTCPAcceptor : IDisposable
+    public class AsyncTcpAcceptor : IDisposable
     {
         private readonly Socket m_Socket;
         public EndPoint LocalEndpoint => m_Socket.LocalEndPoint;
@@ -14,7 +13,7 @@ namespace Server.Core
 
         private bool m_IsDisposed = false;
 
-        public AsyncTCPAcceptor(Action<Socket> onNewConnection)
+        public AsyncTcpAcceptor(Action<Socket> onNewConnection)
         {
             if(onNewConnection == null)
             {
