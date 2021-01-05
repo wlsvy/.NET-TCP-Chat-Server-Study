@@ -21,17 +21,19 @@ namespace Server.Core
         public Server(ServerConfig config)
         {
             m_Config = config;
-            m_ClientConnectionManager = new ClientConnectionManager();
+            m_ClientConnectionManager = new ClientConnectionManager(m_SessionManager);
             m_SessionManager = new SessionManager();
         }
 
-        public void Initialize()
+        public void Start()
         {
-            InitializeSingleton();
             Log.I.Info("=========================\n \tServer Initialize.... \n=========================");
 
             try
             {
+                var ipAddress = IPAddress.Parse(m_Config.CSListenIPAddress);
+
+                m_ClientConnectionManager.Initialize(ipAddress, m_Config.CSListenPort, m_Config.NumberOfCSBacklogSockets);
                 m_GuiWindow.Open();
             }
             catch (Exception e)
@@ -76,27 +78,9 @@ namespace Server.Core
             {
                 return;
             }
+            m_IsDisposed = true;
 
             m_GuiWindow.Dispose();
-
-            DestroySingleton();
-
-            m_IsDisposed = true;
-        }
-
-        private void InitializeSingleton()
-        {
-            Log.I.Initialize();
-        }
-
-        private void Start()
-        {
-            var ipAddress = IPAddress.Parse(m_Config.CSListenIPAddress);
-        }
-
-        private void DestroySingleton()
-        {
-            Log.I.Destroy();
         }
     }
 }

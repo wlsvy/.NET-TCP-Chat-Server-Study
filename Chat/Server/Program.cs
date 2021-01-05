@@ -1,25 +1,28 @@
 ﻿using System;
 using Server.Core;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.IO;
 using System.Reflection;
+using Shared.Logger;
 
 namespace Server
 {
-    static class Program
+    public static class Program
     {
         private static void Main(string[] args)
         {
             Console.WriteLine("=========================== \n \t Run Server! \n===========================");
 
             var config = LoadServerConfig();
+            InitializeSingleton();
 
             using (var server = new Core.Server(config))
             {
-                server.Initialize();
+                server.Start();
                 server.RunMainThreadLoop();
             }
+
+            DestroySingleton();
 
             Console.WriteLine("=========================== \n \t Server Terminated! \n===========================");
         }
@@ -29,8 +32,19 @@ namespace Server
             var path = Assembly.GetExecutingAssembly().Location;
             path = Directory.GetParent(path).FullName;
             path += "\\ServerConfig.json";
+
             var jsonString = File.ReadAllText(path);
             return JsonSerializer.Deserialize<ServerConfig>(jsonString);
+        }
+
+        private static void InitializeSingleton()
+        {
+            Log.I.Initialize();
+        }
+
+        private static void DestroySingleton()
+        {
+            Log.I.Destroy();
         }
     }
 }
