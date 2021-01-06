@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using Server.Core;
 
-namespace AtOnceLauncher
+namespace Launcher
 {
     class Program
     {
@@ -14,13 +14,14 @@ namespace AtOnceLauncher
         {
             Console.WriteLine(
                 @"===============================
-At Once Launcher Start
+Launcher Start
 ===============================");
 
             var directory = FindRootDirectory();
             if(directory == null)
             {
-                Console.WriteLine($"{nameof(AtOnceLauncher)}  프로젝트 루트 폴더를 찾지 못했습니다. 프로그램을 종료합니다.");
+                Console.WriteLine($"{nameof(Launcher)}.{nameof(Main)}  프로젝트 루트 폴더를 찾지 못했습니다. 프로그램을 종료합니다.");
+                return;
                 return;
             }
 
@@ -41,7 +42,7 @@ Launched All Executables!!!
 
             Console.WriteLine(
 @"===============================
-At Once Launcher Terminated
+Launcher Terminated
 ===============================");
         }
 
