@@ -30,7 +30,15 @@ namespace Server.Core
 
             try
             {
-                var ipAddress = IPAddress.Parse(m_Config.CSListenIPAddress);
+                IPAddress ipAddress;
+                if (string.IsNullOrEmpty(m_Config.CSListenIPAddress))
+                {
+                    ipAddress = IPAddress.Any;
+                }
+                else
+                {
+                    ipAddress = IPAddress.Parse(m_Config.CSListenIPAddress);
+                }
 
                 m_ClientConnectionManager.Initialize(ipAddress, m_Config.CSListenPort, m_Config.NumberOfCSBacklogSockets);
             }
@@ -47,6 +55,8 @@ namespace Server.Core
                 return;
             }
             m_IsDisposed = true;
+
+            m_ClientConnectionManager.Dispose();
         }
     }
 }

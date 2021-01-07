@@ -1,6 +1,6 @@
 {
-  "CSListenIPAddress": "123.0.0.1",
-  "CSListenPort": 10000,
+  "CSListenIPAddress": "", 
+  "CSListenPort": 10010,
   "TimeSlicePerUpdateMSec": 16,
   "NumberOfCSBacklogSockets": 5
 }

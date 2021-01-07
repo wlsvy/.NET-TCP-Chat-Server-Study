@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Network\AsyncTcpAcceptor.cs~RF3e3abde5.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
   </ItemGroup>
