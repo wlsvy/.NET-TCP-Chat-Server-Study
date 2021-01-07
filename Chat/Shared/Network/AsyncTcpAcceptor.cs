@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using Shared.Logger;
+using Shared.Interface;
 
 namespace Shared.Network
 {
@@ -10,16 +11,18 @@ namespace Shared.Network
         private readonly Socket m_Socket;
         public EndPoint LocalEndpoint => m_Socket.LocalEndPoint;
         private readonly Action<Socket> m_OnNewConnection;
+        private readonly ILogger m_Logger;
 
         private bool m_IsDisposed = false;
 
-        public AsyncTcpAcceptor(Action<Socket> onNewConnection)
+        public AsyncTcpAcceptor(Action<Socket> onNewConnection, ILogger logger)
         {
             if(onNewConnection == null)
             {
                 throw new ArgumentNullException(nameof(onNewConnection));
             }
             m_Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            m_Logger = logger;
             m_OnNewConnection = onNewConnection;
         }
 
@@ -43,7 +46,10 @@ namespace Shared.Network
                 var args = new SocketAsyncEventArgs();
                 args.AcceptSocket = null;
                 args.Completed += OnAcceptCompleted;
+                StartAccept(args);
             }
+
+            m_Logger?.Info($"Listen 시작. Address : {LocalEndpoint.ToString()}");
         }
 
         public void Dispose()
@@ -67,9 +73,10 @@ namespace Shared.Network
         {
             if (args.SocketError != SocketError.Success)
             {
-                Log.I.Warn($"{nameof(AsyncTcpAcceptor)}.{nameof(this.ProcessAccept)} Accept 실패");
+                m_Logger?.Warn($"{nameof(AsyncTcpAcceptor)}.{nameof(this.ProcessAccept)} Accept 실패");
                 return;
             }
+            m_Logger?.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(ProcessAccept)}!!");
 
             m_OnNewConnection(args.AcceptSocket);
             args.AcceptSocket = null;
@@ -82,6 +89,7 @@ namespace Shared.Network
             {
                 throw new ArgumentNullException(nameof(args.AcceptSocket));
             }
+            m_Logger?.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(StartAccept)}!!");
 
             try
             {
@@ -93,7 +101,7 @@ namespace Shared.Network
             }
             catch(Exception e)
             {
-                Log.I.Error($"Accept 실패 [{e.Message}]", e);
+                m_Logger?.Error($"Accept 실패 [{e.Message}]", e);
             }
         }
     }

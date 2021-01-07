@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Shared.Network;
 using Shared.Util;
+using Shared.Logger;
 
 namespace Server.Core
 {
@@ -19,7 +20,7 @@ namespace Server.Core
 
         public ClientConnectionManager(SessionManager sessionManager)
         {
-            m_Acceptor = new AsyncTcpAcceptor(OnNewConnection);
+            m_Acceptor = new AsyncTcpAcceptor(OnNewConnection, Log.I);
             m_SessionManager = sessionManager;
             m_Connections = new ConcurrentDictionary<long, ClientConnection>();
             m_ClientConnectionIdGenerator = new IdGenerator();

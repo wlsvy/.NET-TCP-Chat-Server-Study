@@ -41,6 +41,7 @@ namespace Shared.Network
         public bool IsClosed => (Volatile.Read(ref m_IsDisposed) != 0);
 
         private readonly Socket m_Socket;
+        private readonly Action<Exception> m_OnSendError;
         private readonly SocketAsyncEventArgs m_SocketAsyncEventArgs = new SocketAsyncEventArgs();
 
         private int m_IsDisposed = 0;
@@ -49,9 +50,10 @@ namespace Shared.Network
         private Operating m_Receiving;
 
 
-        public AsyncTcpConnection(Socket socket)
+        public AsyncTcpConnection(Socket socket, Action<Exception> onSendError)
         {
             m_Socket = socket ?? throw new ArgumentNullException(nameof(socket));
+            m_OnSendError = onSendError;
 
             if (m_Socket.RemoteEndPoint is IPEndPoint remoteEndPoint)
             {
@@ -124,7 +126,8 @@ namespace Shared.Network
             {
                 args.Dispose();
             }
-            Log.I.Warn($"{nameof(AsyncTcpConnection)}.{nameof(this.CloseSocketWhileSending)} 전송 중 오류 발생, Exception [{exception.Message}]");
+            m_OnSendError?.Invoke(exception);
+            //Log.I.Warn($"{nameof(AsyncTcpConnection)}.{nameof(this.CloseSocketWhileSending)} 전송 중 오류 발생, Exception [{exception.Message}]");
             Dispose();
         }
     }
