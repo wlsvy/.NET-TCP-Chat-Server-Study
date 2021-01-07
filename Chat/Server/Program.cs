@@ -3,6 +3,9 @@ using Server.Core;
 using System.Text.Json;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
+using System.Threading;
+using Server.Gui;
 using Shared.Logger;
 
 namespace Server
@@ -19,7 +22,8 @@ namespace Server
             using (var server = new Core.Server(config))
             {
                 server.Start();
-                server.RunMainThreadLoop();
+
+                RunMainThreadLoop(config.TimeSlicePerUpdateMSec);
             }
 
             DestroySingleton();
@@ -45,6 +49,41 @@ namespace Server
         private static void DestroySingleton()
         {
             Log.I.Destroy();
+        }
+
+        private static void RunMainThreadLoop(int timeSlicePerUpdateMSec)
+        {
+            var timer = new Stopwatch();
+            var veldridWindow = new VeldridWindow();
+            var elapsedTimeMSec = 0L;
+
+            timer.Start();
+            veldridWindow.Open();
+
+            while (true)
+            {
+                var currentElapsedTime = timer.ElapsedMilliseconds;
+                var deltaTimeMSec = currentElapsedTime - elapsedTimeMSec;
+                elapsedTimeMSec = currentElapsedTime;
+
+                if (veldridWindow.IsWindowExist)
+                {
+                    veldridWindow.Update((int)deltaTimeMSec);
+                }
+                else
+                {
+                    break;
+                }
+
+                var updateConsumedTime = timer.ElapsedMilliseconds - elapsedTimeMSec;
+                var sleepTime = timeSlicePerUpdateMSec - updateConsumedTime;
+                if (sleepTime > 0)
+                {
+                    Thread.Sleep((int)sleepTime);
+                }
+            }
+
+            veldridWindow.Dispose();
         }
     }
 }
