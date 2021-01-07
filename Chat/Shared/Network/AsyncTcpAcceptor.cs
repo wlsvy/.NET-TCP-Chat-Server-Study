@@ -67,7 +67,7 @@ namespace Shared.Network
         {
             if (args.SocketError != SocketError.Success)
             {
-                Log.I.Error($"Accept 실패");
+                Log.I.Error($"Accept 실패", TODO);
                 return;
             }
 
@@ -93,7 +93,7 @@ namespace Shared.Network
             }
             catch(Exception e)
             {
-                Log.I.Error($"Accept 실패 [{e.Message}]");
+                Log.I.Error($"Accept 실패 [{e.Message}]", e);
             }
         }
     }

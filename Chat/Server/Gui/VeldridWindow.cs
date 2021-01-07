@@ -56,7 +56,7 @@ namespace Server.Gui
             }
             catch(Exception e)
             {
-                Log.I.Error("Veldrid Window 열기 실패");
+                Log.I.Error("Veldrid Window 열기 실패", e);
                 Dispose();
             }
             

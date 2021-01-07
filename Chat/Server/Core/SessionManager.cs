@@ -13,7 +13,7 @@ namespace Server.Core
             var session = new Session(id);
             if(!m_Sessions.TryAdd(id, session))
             {
-                Log.I.Error($"{nameof(SessionManager)}.{nameof(this.CreateSession)} Session 생성 실패");
+                Log.I.Error($"{nameof(SessionManager)}.{nameof(this.CreateSession)} Session 생성 실패", TODO);
                 return null;
             }
 

@@ -36,7 +36,7 @@ namespace Server.Core
             }
             catch (Exception e)
             {
-                Log.I.Error($"서버 초기화 중 오류 발생 - [{e.Message}]");
+                Log.I.Error($"서버 초기화 중 오류 발생", e);
             }
         }
 

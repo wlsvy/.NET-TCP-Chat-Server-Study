@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Shared.Interface;
 using Shared.Util;
 
@@ -24,11 +25,11 @@ namespace Shared.Logger
             }
         }
 
-        public void Error(string message)
+        public void Error(string caption, Exception exception)
         {
             foreach (var logger in m_Loggers)
             {
-                logger.Error(message);
+                logger.Error(caption, exception);
             }
         }
 
