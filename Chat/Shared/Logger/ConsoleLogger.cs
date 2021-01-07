@@ -12,10 +12,10 @@ namespace Shared.Logger
             Console.ResetColor();
         }
 
-        public void Error(string title, Exception exception)
+        public void Error(string caption, Exception exception)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"[Error] {title} \n [Message] {exception.Message} \n [StackTrace] {exception.StackTrace}");
+            Console.WriteLine($"[Error] {caption} \n - [Message] {exception.Message} \n{exception.StackTrace}");
             Console.ResetColor();
         }
 

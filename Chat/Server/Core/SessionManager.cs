@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using Shared.Logger;
 
@@ -13,8 +14,7 @@ namespace Server.Core
             var session = new Session(id);
             if(!m_Sessions.TryAdd(id, session))
             {
-                Log.I.Error($"{nameof(SessionManager)}.{nameof(this.CreateSession)} Session 생성 실패", TODO);
-                return null;
+                throw new ArgumentException($"{nameof(SessionManager)}.{nameof(this.CreateSession)} Session 생성 실패");
             }
 
             return session;

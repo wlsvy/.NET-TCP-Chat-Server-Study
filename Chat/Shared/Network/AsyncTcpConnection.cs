@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Shared.Logger;
 
 namespace Shared.Network
 {
@@ -92,7 +93,7 @@ namespace Shared.Network
             }
             catch (Exception e)
             {
-
+                CloseSocketWhileSending(args, e);
             }
         }
 
@@ -123,6 +124,7 @@ namespace Shared.Network
             {
                 args.Dispose();
             }
+            Log.I.Warn($"{nameof(AsyncTcpConnection)}.{nameof(this.CloseSocketWhileSending)} 전송 중 오류 발생, Exception [{exception.Message}]");
             Dispose();
         }
     }

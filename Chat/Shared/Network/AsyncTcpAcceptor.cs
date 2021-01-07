@@ -67,7 +67,7 @@ namespace Shared.Network
         {
             if (args.SocketError != SocketError.Success)
             {
-                Log.I.Error($"Accept 실패", TODO);
+                Log.I.Warn($"{nameof(AsyncTcpAcceptor)}.{nameof(this.ProcessAccept)} Accept 실패");
                 return;
             }
 
