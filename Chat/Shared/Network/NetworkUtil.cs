@@ -21,6 +21,16 @@ namespace Shared.Network
             }
             receiveContext.SetBuffer(receiveBuffer.Array, beginning, bytesToReceive);
         }
+
+        internal static SendContextData GetSendContextData(this SocketAsyncEventArgs args)
+        {
+            var sendContextData = args.UserToken as SendContextData;
+            if(sendContextData == null)
+            {
+                throw new ArgumentException(nameof(args.UserToken));
+            }
+            return sendContextData;
+        }
     }
 
     internal class ReceiveContextData : IDisposable

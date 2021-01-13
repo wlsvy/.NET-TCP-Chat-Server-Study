@@ -2,8 +2,10 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Shared.Util;
 using System.Linq;
 using Shared.Logger;
+using System.Collections.Generic;
 
 namespace Shared.Network
 {
@@ -245,7 +247,50 @@ namespace Shared.Network
                 return;
             }
 
-            //m_SocketAsyncEventArgs.Get
+            m_SocketAsyncEventArgs.GetSendContextData().Add(sendBuffer);
+            TrySend(m_SocketAsyncEventArgs);
+        }
+        public void Send(IList<ArraySegment<byte>> sendBuffer)
+        {
+            if (sendBuffer == null
+                && sendBuffer.IsEmpty())
+            {
+                return;
+            }
+
+            m_SocketAsyncEventArgs.GetSendContextData().AddRange(sendBuffer);
+            TrySend(m_SocketAsyncEventArgs);
+        }
+
+        public void TrySend(SocketAsyncEventArgs args)
+        {
+            if (!m_Sending.TryEnter())
+            {
+                return;
+            }
+            if (args.GetSendContextData().IsEmpty)
+            {
+                m_Sending.TryExit();
+                return;
+            }
+
+            try
+            {
+                bool willRaiseEventLater;
+                while(!(willRaiseEventLater = SendAsync(args)))
+                {
+                    var canSendAvailableBufferList = CompleteSend(args);
+                    if (!canSendAvailableBufferList)
+                    {
+                        m_Sending.TryExit();
+                        break;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                CloseSocketWhileSending(args, e);
+            }
         }
 
         private void OnSendCompleted(SocketAsyncEventArgs args)
@@ -276,7 +321,12 @@ namespace Shared.Network
                 args.SocketError = SocketError.OperationAborted;
                 return false;
             }
-            //....//
+
+            args.GetSendContextData().CopyBufferListTo(args);
+            if (args.BufferList.IsEmpty())
+            {
+                throw new Exception();
+            }
             return m_Socket.SendAsync(args);
         }
 
@@ -286,8 +336,7 @@ namespace Shared.Network
             {
                 return false;
             }
-            return true;
-            //return args.GetSend
+            return args.GetSendContextData().Skip(args.BytesTransferred);
         }
 
         private void CloseSocketWhileSending(SocketAsyncEventArgs args, Exception exception)
