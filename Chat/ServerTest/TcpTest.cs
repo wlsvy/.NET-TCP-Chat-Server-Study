@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Shared.Logger;
@@ -24,8 +25,90 @@ namespace ServerTest
             var csRecvQueues = new ConcurrentDictionary<long, BufferBlock<string>>();
             var scRecvQueues = new ConcurrentDictionary<long, BufferBlock<string>>();
 
-            var csStreams = new ConcurrentDictionary<long, AsyncTCPConnection>();
-            var scStreams = new ConcurrentDictionary<long, AsyncTCPConnection>();
+            var csStreams = new ConcurrentDictionary<long, AsyncTcpConnection>();
+            var scStreams = new ConcurrentDictionary<long, AsyncTcpConnection>();
+
+            return;
+
+            PrepareSendRecvTcpStream(IPAddress.Loopback, 2020, 1, csStreams, scStreams, csRecvQueues, scRecvQueues);
+
+            int numberOfMessages = 1000;
+            var serverReceivedMessages = scRecvQueues.First().Value;
+            var clientReceivedMessages = csRecvQueues.First().Value;
+            var client = csStreams.First().Value;
+            var server = scStreams.First().Value;
+
+            return;
+
+            var csTask = Task.Run(async () =>
+            {
+                //c -> S
+                for (int i = 0; i < numberOfMessages; ++i)
+                {
+                    client.Send(PackMessage($"CS Message #{i}"));
+                    if (i == numberOfMessages / 3)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(1));
+                    }
+                }
+
+                // S->C 
+                for (int i = 0; i < numberOfMessages; ++i)
+                {
+                    await clientReceivedMessages.Expect($"SC Message #{i}", TimeSpan.FromSeconds(5));
+                    if (i == numberOfMessages / 2)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(1));
+                    }
+                }
+
+                client.Send(PackMessage("CSFINISH"));
+                await clientReceivedMessages.Expect("SCFINISH", TimeSpan.FromSeconds(5));
+            });
+
+            var scTask = Task.Run(async () =>
+            {
+                // S->C 
+                for (int i = 0; i < numberOfMessages; ++i)
+                {
+                    server.Send(PackMessage($"SC Message #{i}"));
+                    if (i == numberOfMessages / 3)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(1));
+                    }
+                }
+
+                // C->S 수신 확인 
+                for (int i = 0; i < numberOfMessages; ++i)
+                {
+                    await serverReceivedMessages.Expect($"CS Message #{i}", TimeSpan.FromSeconds(5));
+                    if (i == numberOfMessages / 2)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(1));
+                    }
+                }
+
+                server.Send(PackMessage("SCFINISH"));
+                await serverReceivedMessages.Expect("CSFINISH", TimeSpan.FromSeconds(5));
+            });
+
+            Task.WaitAll(scTask, csTask);
+
+            Assert.AreEqual(csStreams.Count, 1);
+            Assert.AreEqual(scStreams.Count, 1);
+
+            Assert.AreEqual(serverReceivedMessages.Count, 0);
+            Assert.AreEqual(clientReceivedMessages.Count, 0);
+
+            client.Dispose();
+            server.Dispose();
+
+            var beginTime = DateTime.UtcNow;
+            while ((csStreams.Count > 0) || (scStreams.Count > 0))
+            {
+                Thread.Sleep(1);
+                Assert.IsTrue((DateTime.UtcNow - beginTime) < TimeSpan.FromMilliseconds(1000));
+            }
         }
 
         [TestMethod]

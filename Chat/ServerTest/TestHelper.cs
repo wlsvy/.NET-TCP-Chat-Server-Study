@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ServerTest
 {
-    internal class TestHelper
+    internal static class TestHelper
     {
         public static Task BecomeTrue(Func<bool> condition, TimeSpan timeout)
         {
@@ -30,6 +31,12 @@ namespace ServerTest
                     Assert.Fail(message);
                 }
             }
+        }
+
+        public static async Task Expect(this BufferBlock<string> queue, string expected, TimeSpan timeout)
+        {
+            var value = await queue.ReceiveAsync(timeout);
+            Assert.AreEqual(value, expected);
         }
     }
 }
