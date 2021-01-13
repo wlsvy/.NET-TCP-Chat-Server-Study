@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using Shared.Util;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shared.Network
 {
-    internal sealed class TCPSendBufferQueue
+    internal sealed class TcpSendBufferQueue
     {
         private readonly List<ArraySegment<byte>> m_List = new List<ArraySegment<byte>>(1024);
         private readonly Queue<ArraySegment<byte>> m_Queue = new Queue<ArraySegment<byte>>();
