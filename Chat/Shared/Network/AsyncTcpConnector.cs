@@ -7,7 +7,7 @@ namespace Shared.Network
 {
     public static class AsyncTcpConnector
     {
-        public static void TryConnect(IPAddress ip, int port, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket, object> onCompleted)
+        public static void Connect(IPAddress ip, int port, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket, object> onCompleted)
         {
             if (ip == null)
             {

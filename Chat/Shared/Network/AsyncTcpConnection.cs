@@ -60,7 +60,7 @@ namespace Shared.Network
         private Operating m_Receiving;
 
 
-        public AsyncTcpConnection(Socket socket, Action<Exception> onSendError)
+        public AsyncTcpConnection(Socket socket, Action<Exception> onSendError = null)
         {
             m_Socket = socket ?? throw new ArgumentNullException(nameof(socket));
             m_OnSendError = onSendError;
@@ -236,6 +236,16 @@ namespace Shared.Network
             args.Dispose();
             m_OnReceiveCompleted.Invoke();
             Dispose();
+        }
+
+        public void Send(ArraySegment<byte> sendBuffer)
+        {
+            if(sendBuffer.Count <= 0)
+            {
+                return;
+            }
+
+            //m_SocketAsyncEventArgs.Get
         }
 
         private void OnSendCompleted(SocketAsyncEventArgs args)
