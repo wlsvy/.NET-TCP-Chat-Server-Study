@@ -26,6 +26,8 @@ namespace Shared.Network
                 throw new ArgumentNullException(nameof(remoteEndPoint));
             }
 
+            
+
             var socket = new Socket(remoteEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             var args = new SocketAsyncEventArgs();
             args.RemoteEndPoint = remoteEndPoint;

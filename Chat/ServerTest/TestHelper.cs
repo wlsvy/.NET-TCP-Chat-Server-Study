@@ -5,11 +5,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shared.Logger;
 
 namespace ServerTest
 {
-    internal static class TestHelper
+    public static class TestHelper
     {
+        [AssemblyInitialize]
+        public static void OnTestInit(TestContext ctx)
+        {
+            Log.I.Initialize();
+        }
+
+        [AssemblyCleanup]
+        public static void OnTestCleanup()
+        {
+            Log.I.Destroy();
+        }
+
         public static Task BecomeTrue(Func<bool> condition, TimeSpan timeout)
         {
             return BecomeTrue(condition, timeout, string.Empty);

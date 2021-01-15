@@ -28,9 +28,7 @@ namespace ServerTest
             var csStreams = new ConcurrentDictionary<long, AsyncTcpConnection>();
             var scStreams = new ConcurrentDictionary<long, AsyncTcpConnection>();
 
-            return;
-
-            PrepareSendRecvTcpStream(IPAddress.Loopback, 2020, 1, csStreams, scStreams, csRecvQueues, scRecvQueues);
+            PrepareSendRecvTcpStream(IPAddress.Loopback, 2022, 3, csStreams, scStreams, csRecvQueues, scRecvQueues);
 
             int numberOfMessages = 1000;
             var serverReceivedMessages = scRecvQueues.First().Value;
@@ -202,9 +200,9 @@ namespace ServerTest
                 {
                     long scId = scIds.Generate();
                     var newConnection = new AsyncTcpConnection(socket);
-                    Assert.IsTrue(scStreams.TryAdd(scId, newConnection));
+                    scStreams.TryAdd(scId, newConnection);
 
-                    Action onColsed = () =>
+                    Action onClosed = () =>
                     {
                         scRecvQueues.TryGetValue(scId, out var scRecvQueue);
                         Assert.AreEqual(scRecvQueue.Count, 0);
@@ -222,13 +220,13 @@ namespace ServerTest
                             }
                             return parsedBytes;
                         },
-                        onError: error => onColsed(),
-                        onCompleted: onColsed);
+                        onError: error => Assert.Fail("AsyncTcpAcceptor ¿À·ù"),
+                        onCompleted: onClosed);
                 },
                 logger: new ConsoleLogger());
 
             acceptor.Bind(ip, port);
-            acceptor.ListenAndStart(32);
+            acceptor.ListenAndStart(5);
 
             for(int i = 0; i < numberOfConnections; i++)
             {
