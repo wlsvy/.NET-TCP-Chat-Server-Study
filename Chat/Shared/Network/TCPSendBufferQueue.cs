@@ -16,7 +16,7 @@ namespace Shared.Network
         {
             if(m_List.Count < m_List.Capacity)
             {
-                if(m_Queue.IsEmpty())
+                if(!m_Queue.IsEmpty())
                 {
                     throw new Exception();
                 }
@@ -71,11 +71,8 @@ namespace Shared.Network
 
         public void TrimExcess()
         {
-            if(m_Queue.IsEmpty() || m_List.Capacity <= m_List.Count)
-            {
-                m_Queue.TrimExcess();
-            }
-            throw new Exception();
+            Debug.Assert(m_Queue.IsEmpty() || m_List.Capacity <= m_List.Count);
+            m_Queue.TrimExcess();
         }
     }
 }

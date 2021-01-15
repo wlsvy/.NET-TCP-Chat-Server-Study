@@ -9,6 +9,7 @@ using Shared.Logger;
 
 namespace ServerTest
 {
+    [TestClass]
     public static class TestHelper
     {
         [AssemblyInitialize]

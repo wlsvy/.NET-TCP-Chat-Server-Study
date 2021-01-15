@@ -123,13 +123,9 @@ namespace Shared.Network
 
             public ConnectionContextData(Socket socket, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket, object> onCompleted, object initialData)
             {
-                _ = socket ?? throw new ArgumentNullException(nameof(socket));
-                _ = leftTimeoutList ?? throw new ArgumentNullException(nameof(leftTimeoutList));
-                _ = onCompleted ?? throw new ArgumentNullException(nameof(onCompleted));
-
-                ConnectedSocket = socket;
-                OnCompleted = onCompleted;
-                LeftTimeoutList = leftTimeoutList;
+                ConnectedSocket = socket ?? throw new ArgumentNullException(nameof(socket));
+                OnCompleted = onCompleted ?? throw new ArgumentNullException(nameof(onCompleted));
+                LeftTimeoutList = leftTimeoutList ?? throw new ArgumentNullException(nameof(leftTimeoutList));
                 InitialData = initialData;
             }
 

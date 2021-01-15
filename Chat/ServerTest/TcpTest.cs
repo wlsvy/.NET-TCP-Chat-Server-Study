@@ -28,15 +28,15 @@ namespace ServerTest
             var csStreams = new ConcurrentDictionary<long, AsyncTcpConnection>();
             var scStreams = new ConcurrentDictionary<long, AsyncTcpConnection>();
 
-            PrepareSendRecvTcpStream(IPAddress.Loopback, 2022, 3, csStreams, scStreams, csRecvQueues, scRecvQueues);
+            var numberOfConnection = 3;
 
-            int numberOfMessages = 1000;
+            PrepareSendRecvTcpStream(IPAddress.Loopback, 2022, numberOfConnection, csStreams, scStreams, csRecvQueues, scRecvQueues);
+
+            int numberOfMessages = 100;
             var serverReceivedMessages = scRecvQueues.First().Value;
             var clientReceivedMessages = csRecvQueues.First().Value;
             var client = csStreams.First().Value;
             var server = scStreams.First().Value;
-
-            return;
 
             var csTask = Task.Run(async () =>
             {
@@ -54,6 +54,7 @@ namespace ServerTest
                 for (int i = 0; i < numberOfMessages; ++i)
                 {
                     await clientReceivedMessages.Expect($"SC Message #{i}", TimeSpan.FromSeconds(5));
+                    Log.I.Info($"SC Message #{i}");
                     if (i == numberOfMessages / 2)
                     {
                         await Task.Delay(TimeSpan.FromMilliseconds(1));
@@ -80,6 +81,7 @@ namespace ServerTest
                 for (int i = 0; i < numberOfMessages; ++i)
                 {
                     await serverReceivedMessages.Expect($"CS Message #{i}", TimeSpan.FromSeconds(5));
+                    Log.I.Info($"CS Message #{i}");
                     if (i == numberOfMessages / 2)
                     {
                         await Task.Delay(TimeSpan.FromMilliseconds(1));
@@ -92,14 +94,20 @@ namespace ServerTest
 
             Task.WaitAll(scTask, csTask);
 
-            Assert.AreEqual(csStreams.Count, 1);
-            Assert.AreEqual(scStreams.Count, 1);
+            Assert.AreEqual(csStreams.Count, numberOfConnection);
+            Assert.AreEqual(scStreams.Count, numberOfConnection);
 
             Assert.AreEqual(serverReceivedMessages.Count, 0);
             Assert.AreEqual(clientReceivedMessages.Count, 0);
 
-            client.Dispose();
-            server.Dispose();
+            foreach(var item in csStreams.Values)
+            {
+                item.Dispose();
+            }
+            foreach (var item in scStreams.Values)
+            {
+                item.Dispose();
+            }
 
             var beginTime = DateTime.UtcNow;
             while ((csStreams.Count > 0) || (scStreams.Count > 0))

@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Shared.Util;
-using System.Linq;
 using Shared.Logger;
 using System.Collections.Generic;
 
@@ -49,7 +48,7 @@ namespace Shared.Network
         public bool IsClosed => (Volatile.Read(ref m_IsDisposed) != 0);
 
         private readonly Socket m_Socket;
-        private readonly SocketAsyncEventArgs m_SocketAsyncEventArgs = new SocketAsyncEventArgs();
+        private readonly SocketAsyncEventArgs m_SocketAsyncEventArgs = new SocketAsyncEventArgs { UserToken = new SendContextData() };
         private readonly Action<Exception> m_OnSendError;
 
         private Func<ArraySegment<byte>, int> m_OnReceived;
@@ -92,6 +91,10 @@ namespace Shared.Network
             m_Socket.Shutdown(SocketShutdown.Both);
             m_Socket.Close(timeout: 0);
             m_SocketAsyncEventArgs.Dispose();
+            if(m_SocketAsyncEventArgs.UserToken is SendContextData sendContextData)
+            {
+                sendContextData.Dispose();
+            }
         }
 
         public void Subscribe(Func<ArraySegment<byte>, int> onReceived, Action<Exception> onError, Action onCompleted)
