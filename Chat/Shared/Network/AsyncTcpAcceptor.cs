@@ -11,19 +11,13 @@ namespace Shared.Network
         private readonly Socket m_Socket;
         public EndPoint LocalEndpoint => m_Socket.LocalEndPoint;
         private readonly Action<Socket> m_OnNewConnection;
-        private readonly ILogger m_Logger;
 
         private bool m_IsDisposed = false;
 
-        public AsyncTcpAcceptor(Action<Socket> onNewConnection, ILogger logger)
+        public AsyncTcpAcceptor(Action<Socket> onNewConnection)
         {
-            if(onNewConnection == null)
-            {
-                throw new ArgumentNullException(nameof(onNewConnection));
-            }
             m_Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            m_Logger = logger;
-            m_OnNewConnection = onNewConnection;
+            m_OnNewConnection = onNewConnection ?? throw new ArgumentNullException(nameof(onNewConnection));
         }
 
         public void Bind(IPAddress ip, int port)
@@ -49,7 +43,7 @@ namespace Shared.Network
                 StartAccept(args);
             }
 
-            m_Logger?.Info($"Listen 시작. Address : {LocalEndpoint.ToString()}");
+            Log.I.Info($"Listen 시작. Address : {LocalEndpoint.ToString()}");
         }
 
         public void Dispose()
@@ -73,10 +67,10 @@ namespace Shared.Network
         {
             if (args.SocketError != SocketError.Success)
             {
-                m_Logger?.Warn($"{nameof(AsyncTcpAcceptor)}.{nameof(this.ProcessAccept)} Accept 실패");
+                Log.I.Warn($"{nameof(AsyncTcpAcceptor)}.{nameof(this.ProcessAccept)} Accept 실패");
                 return;
             }
-            m_Logger?.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(ProcessAccept)}!!");
+            Log.I.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(ProcessAccept)}!!");
 
             m_OnNewConnection(args.AcceptSocket);
             args.AcceptSocket = null;
@@ -89,7 +83,7 @@ namespace Shared.Network
             {
                 throw new ArgumentNullException(nameof(args.AcceptSocket));
             }
-            m_Logger?.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(StartAccept)}!!");
+            Log.I.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(StartAccept)}!!");
 
             try
             {
@@ -101,7 +95,7 @@ namespace Shared.Network
             }
             catch(Exception e)
             {
-                m_Logger?.Error($"Accept 실패 [{e.Message}]", e);
+                Log.I.Error($"Accept 실패 [{e.Message}]", e);
             }
         }
     }

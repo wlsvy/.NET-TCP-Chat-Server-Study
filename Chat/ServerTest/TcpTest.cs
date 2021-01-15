@@ -120,10 +120,8 @@ namespace ServerTest
         [TestMethod]
         public void TestMethod1()
         {
-            var ip = IPAddress.Any;
+            var ip = IPAddress.Loopback;
             var port = 10000;
-
-            var logger = new ConsoleLogger();
 
             AsyncTcpConnection exceptionThrower = null;
             AsyncTcpConnection oppositeConnection = null;
@@ -136,19 +134,17 @@ namespace ServerTest
                 {
                     oppositeConnection = new AsyncTcpConnection(
                         socket: accepted, 
-                        onSendError: exception => logger.Error("On Send Error", exception));
+                        onSendError: exception => Log.I.Error("On Send Error", exception));
                     oppositeConnection.Subscribe(
                         onReceived: data => UnpackMessages(data, out var _),
                         onError: error => Assert.Fail("실패"),
                         onCompleted: () => isOppositeTerminated = true);
-
-                },
-                logger: logger);
+                });
 
             acceptor.Bind(ip, port);
             acceptor.ListenAndStart(32);
 
-            var timeout = new[] { TimeSpan.FromMilliseconds(5000) };
+            var timeout = new[] { TimeSpan.FromMilliseconds(5000), TimeSpan.FromMilliseconds(7000) };
 
             AsyncTcpConnector.Connect(
                     ip: ip,
@@ -234,8 +230,7 @@ namespace ServerTest
                         },
                         onError: error => Assert.Fail("AsyncTcpAcceptor 오류"),
                         onCompleted: onClosed);
-                },
-                logger: new ConsoleLogger());
+                });
 
             acceptor.Bind(ip, port);
             acceptor.ListenAndStart(5);
