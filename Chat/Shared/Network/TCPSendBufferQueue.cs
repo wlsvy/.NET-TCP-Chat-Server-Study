@@ -45,10 +45,7 @@ namespace Shared.Network
                 ++i;
             }
 
-            if (sum > bytesSent)
-            {
-                throw new Exception();
-            }
+            Debug.Assert(sum <= bytesSent);
             Debug.Assert(!(sum < bytesSent) || i < m_List.Count && bytesSent - sum < m_List[i].Count);
 
             m_List.RemoveRange(0, i);
