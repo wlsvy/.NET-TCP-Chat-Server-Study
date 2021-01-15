@@ -142,21 +142,25 @@ namespace ServerTest
 
             var timeout = new[] { TimeSpan.FromMilliseconds(5000) };
 
-            AsyncTcpConnector.Connect(ip, port, new Queue<TimeSpan>(timeout),
-                (bool isConnected, Socket newSocket, object initialData) =>
-                {
-                    Assert.IsTrue(isConnected, "연결 실패");
+            AsyncTcpConnector.Connect(
+                    ip: ip,
+                    port: port,
+                    leftTimeoutList: new Queue<TimeSpan>(timeout),
+                    onCompleted: (bool isConnected, Socket newSocket, object initialData) =>
+                    {
+                        Assert.IsTrue(isConnected, "연결 실패");
 
-                    exceptionThrower = new AsyncTcpConnection(newSocket);
-                    exceptionThrower.Subscribe(
-                        onReceived: data => throw new Exception("메세지 파싱"),
-                        onError: error => isExceptionTerminated = true,
-                        onCompleted: () => Assert.Fail("실패"));
-                });
+                        exceptionThrower = new AsyncTcpConnection(newSocket);
+                        exceptionThrower.Subscribe(
+                            onReceived: data => throw new Exception("메세지 파싱"),
+                            onError: error => isExceptionTerminated = true,
+                            onCompleted: () => Assert.Fail("실패"));
+                    },
+                    initialData: null);
 
             TestHelper.BecomeTrue(() =>
             {
-                return exceptionThrower != null 
+                return exceptionThrower != null
                     && oppositeConnection != null;
             }, TimeSpan.FromMilliseconds(3000)).Wait();
 
@@ -231,8 +235,11 @@ namespace ServerTest
             for(int i = 0; i < numberOfConnections; i++)
             {
                 var timeout = new Queue<TimeSpan>(new[] { TimeSpan.FromMilliseconds(5000) });
-                AsyncTcpConnector.Connect(ip, port, timeout,
-                    (bool isConnected, Socket socket, object initialData) =>
+                AsyncTcpConnector.Connect(
+                    ip: ip, 
+                    port: port, 
+                    leftTimeoutList: timeout,
+                    onCompleted: (bool isConnected, Socket socket, object initialData) =>
                     {
                         Assert.IsTrue(isConnected);
 
@@ -260,7 +267,8 @@ namespace ServerTest
                                 },
                                 onError: error => onClosed(),
                                 onCompleted: onClosed);
-                    });
+                    }, 
+                    initialData: null);
             }
 
             while (csStreams.Count() < numberOfConnections ||
