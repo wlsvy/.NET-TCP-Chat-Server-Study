@@ -20,7 +20,7 @@ namespace Server.Core
 
         public ClientConnectionManager(SessionManager sessionManager)
         {
-            m_Acceptor = new AsyncTcpAcceptor(OnNewConnection, Log.I);
+            m_Acceptor = new AsyncTcpAcceptor(OnNewConnection);
             m_SessionManager = sessionManager;
             m_Connections = new ConcurrentDictionary<long, ClientConnection>();
             m_ClientConnectionIdGenerator = new IdGenerator();

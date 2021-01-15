@@ -97,11 +97,11 @@ namespace Shared.Network
             }
         }
 
-        public void Subscribe(Func<ArraySegment<byte>, int> onReceived, Action<Exception> onError, Action onCompleted)
+        public void Subscribe(Func<ArraySegment<byte>, int> onReceived, Action<Exception> onError, Action onReceiveCompleted)
         {
             m_OnReceived = onReceived ?? throw new ArgumentNullException(nameof(onReceived));
             m_OnReceiveError = onError ?? throw new ArgumentNullException(nameof(onError));
-            m_OnReceiveCompleted = onCompleted ?? throw new ArgumentNullException(nameof(onCompleted));
+            m_OnReceiveCompleted = onReceiveCompleted ?? throw new ArgumentNullException(nameof(onReceiveCompleted));
 
             if (IsClosed)
             {
@@ -351,6 +351,10 @@ namespace Shared.Network
             if (m_Sending.TryDispose())
             {
                 args.Dispose();
+                if(args.UserToken is SendContextData sendContextData)
+                {
+                    sendContextData.Dispose();
+                }
             }
             m_OnSendError?.Invoke(exception);
             Dispose();

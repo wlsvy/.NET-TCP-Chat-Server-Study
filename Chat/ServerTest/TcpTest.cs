@@ -118,13 +118,16 @@ namespace ServerTest
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public async Task ExceptionFromApplication()
         {
+            // 어플리케이션 레벨에서 onReceiveTCPData()를 처리하면서 예외가 발생하는 경우,
+            // 연결을 종료시켜 onTerminated가 불려야 한다. (좀비커넥션으로 남지 않도록)
+
             var ip = IPAddress.Loopback;
             var port = 10000;
 
-            AsyncTcpConnection exceptionThrower = null;
-            AsyncTcpConnection oppositeConnection = null;
+            AsyncTcpConnection clientSideConnection = null;
+            AsyncTcpConnection serverSideConnection = null;
 
             bool isOppositeTerminated = false;
             bool isExceptionTerminated = false;
@@ -132,17 +135,17 @@ namespace ServerTest
             var acceptor = new AsyncTcpAcceptor(
                 onNewConnection: (accepted) =>
                 {
-                    oppositeConnection = new AsyncTcpConnection(
+                    serverSideConnection = new AsyncTcpConnection(
                         socket: accepted, 
                         onSendError: exception => Log.I.Error("On Send Error", exception));
-                    oppositeConnection.Subscribe(
+                    serverSideConnection.Subscribe(
                         onReceived: data => UnpackMessages(data, out var _),
                         onError: error => Assert.Fail("실패"),
-                        onCompleted: () => isOppositeTerminated = true);
+                        onReceiveCompleted: () => isOppositeTerminated = true);
                 });
 
             acceptor.Bind(ip, port);
-            acceptor.ListenAndStart(32);
+            acceptor.ListenAndStart(1);
 
             var timeout = new[] { TimeSpan.FromMilliseconds(5000), TimeSpan.FromMilliseconds(7000) };
 
@@ -154,35 +157,34 @@ namespace ServerTest
                     {
                         Assert.IsTrue(isConnected, "연결 실패");
 
-                        exceptionThrower = new AsyncTcpConnection(newSocket);
-                        exceptionThrower.Subscribe(
+                        clientSideConnection = new AsyncTcpConnection(newSocket);
+                        clientSideConnection.Subscribe(
                             onReceived: data => throw new Exception("메세지 파싱"),
                             onError: error => isExceptionTerminated = true,
-                            onCompleted: () => Assert.Fail("실패"));
+                            onReceiveCompleted: () => Assert.Fail("실패"));   //정상적으로 메세지 수신 시 테스트 실패
                     },
                     initialData: null);
 
-            TestHelper.BecomeTrue(() =>
+            await TestHelper.BecomeTrue(() =>
             {
-                return exceptionThrower != null
-                    && oppositeConnection != null;
-            }, TimeSpan.FromMilliseconds(3000)).Wait();
+                return clientSideConnection != null
+                    && serverSideConnection != null;
+            }, TimeSpan.FromMilliseconds(3000));
 
-            oppositeConnection.Send(new ArraySegment<byte>(Encoding.UTF8.GetBytes("핑퐁")));
+            serverSideConnection.Send(new ArraySegment<byte>(Encoding.UTF8.GetBytes("핑퐁")));
 
-            TestHelper.BecomeTrue(() =>
+            await TestHelper.BecomeTrue(() =>
             {
-                return (isExceptionTerminated == true) &&
-                       (isOppositeTerminated);
-            }, TimeSpan.FromSeconds(2)).Wait();
+                return isExceptionTerminated && isOppositeTerminated;
+            }, TimeSpan.FromSeconds(2));
 
             Assert.IsTrue(isExceptionTerminated);
             Assert.IsTrue(isOppositeTerminated);
 
             acceptor.Dispose();
 
-            exceptionThrower.Dispose();
-            oppositeConnection.Dispose();
+            clientSideConnection.Dispose();
+            serverSideConnection.Dispose();
         }
 
         private static async Task PrepareSendRecvTcpStream(
@@ -229,7 +231,7 @@ namespace ServerTest
                             return parsedBytes;
                         },
                         onError: error => Assert.Fail("AsyncTcpAcceptor 오류"),
-                        onCompleted: onClosed);
+                        onReceiveCompleted: onClosed);
                 });
 
             acceptor.Bind(ip, port);
@@ -269,7 +271,7 @@ namespace ServerTest
                                     return parsedBytes;
                                 },
                                 onError: error => onClosed(),
-                                onCompleted: onClosed);
+                                onReceiveCompleted: onClosed);
                     }, 
                     initialData: null);
             }
