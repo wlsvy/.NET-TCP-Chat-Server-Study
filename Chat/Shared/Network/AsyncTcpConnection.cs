@@ -254,7 +254,7 @@ namespace Shared.Network
 
         public void Send(ArraySegment<byte> sendBuffer)
         {
-            if(sendBuffer.Count <= 0)
+            if(sendBuffer.IsEmpty())
             {
                 return;
             }
