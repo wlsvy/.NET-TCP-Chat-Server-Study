@@ -1,6 +1,16 @@
-﻿namespace Shared.Protocol
+﻿using System;
+
+namespace Shared.Protocol
 {
-    public static class PacketProcessor
+    public sealed class PacketProcessor
     {
+
+        private void ParseAndHandleBody(PacketHeader header, ArraySegment<byte> body)
+        {
+            switch (header.Protocol)
+            {
+                case PacketProtocol.SC_Ping: return;
+            }
+        }
     }
 }

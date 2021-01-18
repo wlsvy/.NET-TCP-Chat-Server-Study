@@ -7,7 +7,7 @@ using Shared.Util;
 
 namespace Shared.Network
 {
-    public class BinaryDecoder : IDisposable
+    public sealed class BinaryDecoder : IDisposable
     {
         private readonly ArraySegment<byte> m_Buffer;
         private int m_ReadOffset;
