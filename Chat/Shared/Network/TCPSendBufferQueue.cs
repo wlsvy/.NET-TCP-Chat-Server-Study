@@ -16,10 +16,7 @@ namespace Shared.Network
         {
             if(m_List.Count < m_List.Capacity)
             {
-                if(!m_Queue.IsEmpty())
-                {
-                    throw new Exception();
-                }
+                Debug.Assert(m_Queue.IsEmpty());
 
                 m_List.Add(sendBuffer);
             }

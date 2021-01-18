@@ -5,6 +5,7 @@ using System.Threading;
 using Shared.Util;
 using Shared.Logger;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Shared.Network
 {
@@ -210,7 +211,7 @@ namespace Shared.Network
             }
             else
             {
-                var nextRequestReadBytes = READ_BYTES_INCREASING_RATE;
+                var nextRequestReadBytes = READ_BYTES_INCREASING_RATE * bytesReceiveRequested;
                 if(nextRequestReadBytes < 0)
                 {
                     nextRequestReadBytes = int.MaxValue;
@@ -224,6 +225,8 @@ namespace Shared.Network
 
         private void CloseSocketWhileReceiving(SocketAsyncEventArgs args, Exception exception)
         {
+            Log.I.Info($"{nameof(AsyncTcpConnection)}.{nameof(CloseSocketWhileReceiving)} Close Socket! with error");
+
             m_Receiving.TryDispose();
             if(args.UserToken is ReceiveContextData receiveCtx)
             {
@@ -236,6 +239,8 @@ namespace Shared.Network
         }
         private void CloseSocketWhileReceiving(SocketAsyncEventArgs args)
         {
+            Log.I.Info($"{nameof(AsyncTcpConnection)}.{nameof(CloseSocketWhileReceiving)} Close Socket!");
+
             m_Receiving.TryDispose();
             if (args.UserToken is ReceiveContextData receiveCtx)
             {
@@ -260,7 +265,7 @@ namespace Shared.Network
         public void Send(IList<ArraySegment<byte>> sendBuffer)
         {
             if (sendBuffer == null
-                && sendBuffer.IsEmpty())
+                || sendBuffer.IsEmpty())
             {
                 return;
             }
@@ -330,10 +335,9 @@ namespace Shared.Network
             }
 
             args.GetSendContextData().CopyBufferListTo(args);
-            if (args.BufferList.IsEmpty())
-            {
-                throw new Exception();
-            }
+
+            Debug.Assert(!args.BufferList.IsEmpty());
+
             return m_Socket.SendAsync(args);
         }
 

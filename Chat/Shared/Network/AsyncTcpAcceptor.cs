@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using Shared.Logger;
 using Shared.Interface;
+using System.Diagnostics;
 
 namespace Shared.Network
 {
@@ -22,10 +23,7 @@ namespace Shared.Network
 
         public void Bind(IPAddress ip, int port)
         {
-            if(ip == null)
-            {
-                throw new ArgumentNullException(nameof(ip));
-            }
+            _ = ip ?? throw new ArgumentNullException(nameof(ip));
 
             var localEndPoint = new IPEndPoint(ip, port);
             m_Socket.Bind(localEndPoint);
@@ -70,7 +68,7 @@ namespace Shared.Network
                 Log.I.Warn($"{nameof(AsyncTcpAcceptor)}.{nameof(this.ProcessAccept)} Accept 실패");
                 return;
             }
-            Log.I.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(ProcessAccept)}!!");
+            Log.I.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(ProcessAccept)} Accept 성공");
 
             m_OnNewConnection(args.AcceptSocket);
             args.AcceptSocket = null;
@@ -79,10 +77,8 @@ namespace Shared.Network
 
         private void StartAccept(SocketAsyncEventArgs args)
         {
-            if(args.AcceptSocket != null)
-            {
-                throw new ArgumentNullException(nameof(args.AcceptSocket));
-            }
+            Debug.Assert(args.AcceptSocket == null);
+
             Log.I.Info($"{nameof(AsyncTcpAcceptor)}.{nameof(StartAccept)}!!");
 
             try

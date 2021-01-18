@@ -14,6 +14,8 @@ using Shared.Logger;
 using Shared.Network;
 using Shared.Util;
 
+[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)]
+
 namespace ServerTest
 {
     [TestClass]
@@ -112,7 +114,7 @@ namespace ServerTest
             var beginTime = DateTime.UtcNow;
             while ((csStreams.Count > 0) || (scStreams.Count > 0))
             {
-                await Task.Delay(1000);
+                await Task.Delay(100);
                 Assert.IsTrue((DateTime.UtcNow - beginTime) < TimeSpan.FromMilliseconds(1000));
             }
         }
