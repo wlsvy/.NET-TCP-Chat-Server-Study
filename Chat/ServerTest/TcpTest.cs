@@ -20,7 +20,7 @@ namespace ServerTest
     public class TcpTest
     {
         [TestMethod]
-        public void ConnectionTest()
+        public async Task ConnectionTest()
         {
             var csRecvQueues = new ConcurrentDictionary<long, BufferBlock<string>>();
             var scRecvQueues = new ConcurrentDictionary<long, BufferBlock<string>>();
@@ -30,7 +30,7 @@ namespace ServerTest
 
             var numberOfConnection = 3;
 
-            PrepareSendRecvTcpStream(IPAddress.Loopback, 2022, numberOfConnection, csStreams, scStreams, csRecvQueues, scRecvQueues);
+            await PrepareSendRecvTcpStream(IPAddress.Loopback, 2022, numberOfConnection, csStreams, scStreams, csRecvQueues, scRecvQueues);
 
             int numberOfMessages = 100;
             var serverReceivedMessages = scRecvQueues.First().Value;
@@ -112,7 +112,7 @@ namespace ServerTest
             var beginTime = DateTime.UtcNow;
             while ((csStreams.Count > 0) || (scStreams.Count > 0))
             {
-                Thread.Sleep(1);
+                await Task.Delay(1000);
                 Assert.IsTrue((DateTime.UtcNow - beginTime) < TimeSpan.FromMilliseconds(1000));
             }
         }
