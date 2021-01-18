@@ -20,6 +20,8 @@ namespace Shared.Network
 
         public BinaryEncoder(ArraySegment<byte> buffer)
         {
+            _ = buffer.Array ?? throw new ArgumentNullException(nameof(buffer));
+
             m_Buffer = buffer;
             m_Stream = new MemoryStream(m_Buffer.Array, m_Buffer.Offset, m_Buffer.Count);
             m_Writer = new BinaryWriter(m_Stream);
