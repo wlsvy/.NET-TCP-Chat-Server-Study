@@ -81,7 +81,7 @@ namespace Server.Core
             }
 
             connection.StartReceive();
-            connection.PacketSender.SEND_SYSTEM_TEST_PINT(0);
+            //connection.PacketSender.SEND_SYSTEM_TEST_PINT(0);
         }
     }
 }

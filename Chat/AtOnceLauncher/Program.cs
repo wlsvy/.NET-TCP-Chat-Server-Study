@@ -22,7 +22,6 @@ Launcher Start
             {
                 Console.WriteLine($"{nameof(Launcher)}.{nameof(Main)}  프로젝트 루트 폴더를 찾지 못했습니다. 프로그램을 종료합니다.");
                 return;
-                return;
             }
 
             var serverProjectPath = Path.Combine(directory.FullName, "Chat", "Server");

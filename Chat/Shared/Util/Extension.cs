@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Shared.Network;
+using Shared.Protocol;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -29,14 +31,26 @@ namespace Shared.Util
         public static int SizeForWrite(this bool value) => sizeof(bool);
         public static int SizeForWrite(this float value) => sizeof(float);
         public static int SizeForWrite(this double value) => sizeof(double);
+        public static int SizeForWrite(this PacketProtocol value) => sizeof(byte);
         public static int SizeForWrite(this string value)
         {
             return sizeof(int) + Encoding.UTF8.GetByteCount(value);
         }
         public static int SizeForWrite(this List<int> list)
         {
-            // length + elements
-            return sizeof(int) + list.Count * sizeof(int);
+            return sizeof(int) + list.Count * sizeof(int); // length + elements
+        }
+
+        public static void Write(this BinaryEncoder encoder, in PacketProtocol value)
+        {
+            byte underlyingValue = (byte)value;
+            encoder.Write(in underlyingValue);
+        }
+        public static int Read(this BinaryDecoder decoder, out PacketProtocol value)
+        {
+            var consumedBytes = decoder.Read(out byte underlyingValue);
+            value = (PacketProtocol)underlyingValue;
+            return consumedBytes;
         }
     }
 }

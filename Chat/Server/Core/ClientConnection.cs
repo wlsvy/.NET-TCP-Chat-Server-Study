@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Net.Sockets;
-using Shared.Protocol.SC;
 
 namespace Server.Core
 {
     public sealed class ClientConnection : IDisposable
     {
         public readonly long Id;
-        public readonly SCPacketSender PacketSender;
+        //public readonly SCPacketSender PacketSender;
         private Session m_Session;
 
         private bool m_IsDisposed = false;
@@ -21,7 +20,7 @@ namespace Server.Core
             }
 
             Id = id;
-            PacketSender = new SCPacketSender();
+            //PacketSender = new SCPacketSender();
         }
 
         public void StartReceive()
