@@ -308,6 +308,45 @@ namespace ServerTest
             return totalParsedBytes;
         }
 
+        [TestMethod]
+        public void DuplicatedPortBinding()
+        {
+            var first = new AsyncTcpAcceptor(
+                onNewConnection: accepted =>
+                {
+                    //Do nothing
+                    accepted.Close();
+                });
+            var second = new AsyncTcpAcceptor(
+                onNewConnection: accepted =>
+                {
+                    //Do nothing
+                    accepted.Close();
+                });
+
+            first.Bind(IPAddress.Loopback, 12254);
+            Assert.ThrowsException<SocketException>(() =>
+            {
+                second.Bind(IPAddress.Loopback, 12254);
+            });
+
+            Assert.ThrowsException<SocketException>(() =>
+            {
+                first.Bind(IPAddress.Loopback, 12255);
+            });
+
+            second.Bind(IPAddress.Loopback, 12256);
+
+            first.ListenAndStart(4);
+            second.ListenAndStart(4);
+
+            Assert.IsTrue(Uri.TryCreate($"tcp://{first.LocalEndpoint.ToString()}", UriKind.Absolute, out var firstListenUri));
+            Assert.IsTrue(firstListenUri.Port == 12254);
+
+            Assert.IsTrue(Uri.TryCreate($"tcp://{second.LocalEndpoint.ToString()}", UriKind.Absolute, out var secondListenUri));
+            Assert.IsTrue(secondListenUri.Port == 12256);
+        }
+
         private static int UnpackMessage(ArraySegment<byte> tcpData, out string message)
         {
             if (tcpData.Count < 4)
