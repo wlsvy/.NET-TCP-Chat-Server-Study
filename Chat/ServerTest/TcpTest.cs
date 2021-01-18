@@ -189,6 +189,139 @@ namespace ServerTest
             serverSideConnection.Dispose();
         }
 
+        [TestMethod]
+        public void DuplicatedPortBinding()
+        {
+            var first = new AsyncTcpAcceptor(
+                onNewConnection: accepted =>
+                {
+                    //Do nothing
+                    accepted.Close();
+                });
+            var second = new AsyncTcpAcceptor(
+                onNewConnection: accepted =>
+                {
+                    //Do nothing
+                    accepted.Close();
+                });
+
+            first.Bind(IPAddress.Loopback, 12254);
+            Assert.ThrowsException<SocketException>(() =>
+            {
+                second.Bind(IPAddress.Loopback, 12254);
+            });
+
+            Assert.ThrowsException<SocketException>(() =>
+            {
+                first.Bind(IPAddress.Loopback, 12255);
+            });
+
+            second.Bind(IPAddress.Loopback, 12256);
+
+            first.ListenAndStart(4);
+            second.ListenAndStart(4);
+
+            Assert.IsTrue(Uri.TryCreate($"tcp://{first.LocalEndpoint.ToString()}", UriKind.Absolute, out var firstListenUri));
+            Assert.IsTrue(firstListenUri.Port == 12254);
+
+            Assert.IsTrue(Uri.TryCreate($"tcp://{second.LocalEndpoint.ToString()}", UriKind.Absolute, out var secondListenUri));
+            Assert.IsTrue(secondListenUri.Port == 12256);
+        }
+
+        [TestMethod]
+        public void AsyncTcpAcceptor()
+        {
+            var listenIp = IPAddress.Loopback;
+            int listenPort = 12255;
+
+            var acceptedConnections = new ConcurrentQueue<AsyncTcpConnection>();
+
+            var acceptor = new AsyncTcpAcceptor(
+                onNewConnection: accepted =>
+                {
+                    var newConnection = new AsyncTcpConnection(accepted);
+                    newConnection.Subscribe(_ => 0, _ => { }, () => { });
+                    acceptedConnections.Enqueue(newConnection);
+                });
+
+            int numberOfBacklogSockets = 8;
+            acceptor.Bind(listenIp, listenPort);
+            acceptor.ListenAndStart(numberOfBacklogSockets);
+
+            var isDone = new AutoResetEvent(false);
+
+            Func<Socket, AsyncTcpConnection> tcpStreamCreator = socket =>
+            {
+                var newStream = new AsyncTcpConnection(socket);
+                newStream.Subscribe(_ => 0, _ => { }, () => { });
+                return newStream;
+            };
+
+            AsyncTcpConnector.Connect(
+                ip: listenIp,
+                port: listenPort,
+                leftTimeoutList: new Queue<TimeSpan>(new[]
+                {
+                    TimeSpan.FromMilliseconds(100),
+                    TimeSpan.FromMilliseconds(100),
+                    TimeSpan.FromMilliseconds(100),
+                    TimeSpan.FromMilliseconds(100) }),
+                onCompleted: (isConnected, socket, initialData) =>
+                {
+                    Assert.IsTrue(isConnected);
+                    Assert.IsNotNull(socket);
+
+                    var newStream = tcpStreamCreator(socket);
+                    Assert.IsNotNull(newStream);
+
+                    isDone.Set();
+                },
+                initialData: null);
+
+            Assert.IsTrue(isDone.WaitOne(TimeSpan.FromSeconds(5)));
+            isDone.Reset();
+
+            BecomeTrue(()=>
+            {
+                return (acceptedConnections.Count >= 1);
+            }, TimeSpan.FromSeconds(1)).Wait();
+
+            var connectionCount = 5 * numberOfBacklogSockets;
+
+            for(int i = 0; i < connectionCount; i++){
+                AsyncTcpConnector.Connect(
+                ip: listenIp,
+                port: listenPort,
+                leftTimeoutList: new Queue<TimeSpan>(new[]
+                {
+                    TimeSpan.FromMilliseconds(100),
+                    TimeSpan.FromMilliseconds(100),
+                    TimeSpan.FromMilliseconds(100),
+                    TimeSpan.FromMilliseconds(100) }),
+                onCompleted: (isConnected, socket, initialData) =>
+                {
+                    Assert.IsTrue(isConnected);
+                    Assert.IsNotNull(socket);
+
+                    var newStream = tcpStreamCreator(socket);
+                    Assert.IsNotNull(newStream);
+
+                    isDone.Set();
+                },
+                initialData: null);
+            }
+
+            BecomeTrue(() =>
+            {
+                return (acceptedConnections.Count >= connectionCount);
+            }, TimeSpan.FromSeconds(1)).Wait();
+
+            foreach(var c in acceptedConnections)
+            {
+                c.Dispose();
+            }
+        }
+
         private static async Task PrepareSendRecvTcpStream(
             IPAddress ip,
             int port,
@@ -308,45 +441,6 @@ namespace ServerTest
             return totalParsedBytes;
         }
 
-        [TestMethod]
-        public void DuplicatedPortBinding()
-        {
-            var first = new AsyncTcpAcceptor(
-                onNewConnection: accepted =>
-                {
-                    //Do nothing
-                    accepted.Close();
-                });
-            var second = new AsyncTcpAcceptor(
-                onNewConnection: accepted =>
-                {
-                    //Do nothing
-                    accepted.Close();
-                });
-
-            first.Bind(IPAddress.Loopback, 12254);
-            Assert.ThrowsException<SocketException>(() =>
-            {
-                second.Bind(IPAddress.Loopback, 12254);
-            });
-
-            Assert.ThrowsException<SocketException>(() =>
-            {
-                first.Bind(IPAddress.Loopback, 12255);
-            });
-
-            second.Bind(IPAddress.Loopback, 12256);
-
-            first.ListenAndStart(4);
-            second.ListenAndStart(4);
-
-            Assert.IsTrue(Uri.TryCreate($"tcp://{first.LocalEndpoint.ToString()}", UriKind.Absolute, out var firstListenUri));
-            Assert.IsTrue(firstListenUri.Port == 12254);
-
-            Assert.IsTrue(Uri.TryCreate($"tcp://{second.LocalEndpoint.ToString()}", UriKind.Absolute, out var secondListenUri));
-            Assert.IsTrue(secondListenUri.Port == 12256);
-        }
-
         private static int UnpackMessage(ArraySegment<byte> tcpData, out string message)
         {
             if (tcpData.Count < 4)
@@ -388,6 +482,26 @@ namespace ServerTest
                 writer.Flush();
 
                 return new ArraySegment<byte>(ms.GetBuffer(), (int)startPosition, (int)(ms.Position - startPosition));
+            }
+        }
+
+        public static Task BecomeTrue(Func<bool> condition, TimeSpan timeout)
+        {
+            return BecomeTrue(condition, timeout, string.Empty);
+        }
+
+        public static async Task BecomeTrue(Func<bool> condition, TimeSpan timeout, string message)
+        {
+            if (condition == null) throw new ArgumentNullException(nameof(condition));
+
+            var until = DateTime.UtcNow + timeout;
+            while (!condition())
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
+                if (until <= DateTime.UtcNow)
+                {
+                    Assert.Fail(message);
+                }
             }
         }
     }
