@@ -24,7 +24,7 @@ namespace Server.Core
 
         public void Start()
         {
-            Log.I.Info("=========================\n \tServer Initialize.... \n=========================");
+            Log.I.Info("\tServer Initialize.... \n---------------------------------");
 
             try
             {

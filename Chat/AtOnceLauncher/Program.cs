@@ -3,10 +3,13 @@ using System.IO;
 using System.Diagnostics;
 using System.Text.Json;
 using Server.Core;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Launcher
 {
-    class Program
+    static class Program
     {
         public const string ROOT_DIRECTORY_NAME = ".NET-TCP-Chat-Server-Study";
 
@@ -16,6 +19,7 @@ namespace Launcher
                 @"===============================
 Launcher Start
 ===============================");
+
 
             var directory = FindRootDirectory();
             if(directory == null)
@@ -32,12 +36,24 @@ Launcher Start
 
             var serverProcess = Process.Start(serverExecutable[0]);
 
+            var clientBotTasks = new List<Task>();
+            var clientTaskCanceller = new CancellationTokenSource();
+            const int ClientCount = 5;
+            for(int i = 0; i < ClientCount; i++)
+            {
+                var task = Task.Run(() => Client.Program.Main_Bot(clientTaskCanceller));
+                clientBotTasks.Add(task);
+            }
+
             Console.WriteLine(
     @"===============================
 Launched All Executables!!!
 ===============================");
 
             serverProcess.WaitForExit();
+
+            clientTaskCanceller.Cancel();
+            Task.WaitAll(clientBotTasks.ToArray());
 
             Console.WriteLine(
 @"===============================

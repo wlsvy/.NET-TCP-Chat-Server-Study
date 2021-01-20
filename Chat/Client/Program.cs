@@ -9,11 +9,11 @@ using System.Threading;
 
 namespace Client
 {
-    class Program
+    public static class Program
     {
         public static void Main_Bot(CancellationTokenSource cts)
         {
-            Console.WriteLine("=========================== \n \t Run Client Bot! \n===========================");
+            Console.WriteLine("=========================== \n   Run Client Bot! \n===========================");
 
             var config = LoadClientConfig();
 
@@ -29,7 +29,7 @@ namespace Client
 
             DestroySingleton();
 
-            Console.WriteLine("=========================== \n \t Client Bot Terminated! \n===========================");
+            Console.WriteLine("=========================== \n   Client Bot Terminated! \n===========================");
         }
 
         private static void Main(string[] args)
