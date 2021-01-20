@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Shared.Network;
+using Shared.Util;
+using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Shared.Network;
-using Shared.Util;
-using Shared.Logger;
 
 namespace Server.Core
 {
@@ -81,7 +80,6 @@ namespace Server.Core
             }
 
             connection.StartReceive();
-            //connection.PacketSender.SEND_SYSTEM_TEST_PINT(0);
         }
     }
 }
