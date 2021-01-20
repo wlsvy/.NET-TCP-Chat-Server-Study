@@ -4,18 +4,47 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shared.Protocol
 {
     public sealed class PacketProcessor
     {
-        private ConcurrentQueue<Func<Task>> m_HandlerQueue;
-        private PacketHandler m_PacketHandler;
+        public struct Barrier
+        {
+            private const int LOCKED = 1;
+            private const int FREE = 0;
+
+            private int m_Value;
+
+            public bool TryEnter()
+            {
+                if(Interlocked.CompareExchange(ref m_Value, LOCKED, FREE) == FREE)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            public bool TryExit()
+            {
+                if (Interlocked.CompareExchange(ref m_Value, FREE, LOCKED) == LOCKED)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        private readonly PacketHandler m_PacketHandler;
+        private readonly ConcurrentQueue<Func<Task>> m_HandlerQueue;
+        private readonly Barrier m_Barrier;
 
         public PacketProcessor(PacketHandler handler)
         {
             m_PacketHandler = handler ?? throw new ArgumentNullException(nameof(handler));
+            m_HandlerQueue = new ConcurrentQueue<Func<Task>>();
         }
 
         public int ParseAndHandlePacket(ArraySegment<byte> dataStream)
@@ -35,6 +64,14 @@ namespace Shared.Protocol
             ParseAndHandleBody(packetHeader, packetBody);
 
             return (PacketHeader.HEADER_SIZE + packetHeader.BodySize);
+        }
+
+        public async Task ProcessHandler()
+        {
+            while (m_HandlerQueue.TryDequeue(out var handler))
+            {
+                await handler.Invoke();
+            }
         }
 
         private static PacketHeader ParseHeader(ArraySegment<byte> dataStream)
@@ -80,7 +117,7 @@ namespace Shared.Protocol
         {
             switch (header.Protocol)
             {
-                case PacketProtocol.SC_Ping: return;
+                case PacketProtocol.SC_Ping_NTF: return;
             }
         }
 
@@ -90,16 +127,24 @@ namespace Shared.Protocol
             {
                 reader.Read(out long sequenceNumber);
 
-                ReserveHandler(handler: async () =>
+                RunOrReserveHandler(handler: async () =>
                 {
-                    m_PacketHandler.HANDLE_SC_Ping(sequenceNumber);
+                    m_PacketHandler.HANDLE_SC_Ping_NTF(sequenceNumber);
                 });
             }
         }
 
-        private void ReserveHandler(Func<Task> handler)
+        //TODO 여기 레이스 컨디션 테스트 해보기
+        private void RunOrReserveHandler(Func<Task> handler)
         {
             m_HandlerQueue.Enqueue(handler);
+
+            if (m_Barrier.TryEnter())
+            {
+                ProcessHandler();
+
+                m_Barrier.TryExit();
+            }
         }
     }
 }

@@ -2,6 +2,6 @@
 {
     public abstract class PacketHandler
     {
-        public virtual void HANDLE_SC_Ping(long sequenceNumber) { }
+        public virtual void HANDLE_SC_Ping_NTF(long sequenceNumber) { }
     }
 }

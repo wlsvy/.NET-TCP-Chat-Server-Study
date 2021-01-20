@@ -14,7 +14,7 @@ namespace Shared.Protocol
 
         public static ArraySegment<byte> Pack_SC_Ping(long sequenceNum)
         {
-            var protocol = PacketProtocol.SC_Ping;
+            var protocol = PacketProtocol.SC_Ping_NTF;
 
             int bodySize = sequenceNum.SizeForWrite();
             int packetSize = PacketHeader.HEADER_SIZE + bodySize;

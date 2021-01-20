@@ -6,7 +6,7 @@ namespace Server.Core
 {
     public sealed class ServerPacketHandler : PacketHandler
     {
-        public override void HANDLE_SC_Ping(long sequenceNumber)
+        public override void HANDLE_SC_Ping_NTF(long sequenceNumber)
         {
             Log.I.Info($"Network Ping : {sequenceNumber}");
         }

@@ -4,13 +4,16 @@
     {
         Invalid,
 
-        SC_Ping,
-        CS_Pong,
+        SC_Ping_NTF,
+        CS_Pong_NTF,
 
-        CS_Login,
-        CS_CreateAccount,
+        CS_Login_REQ,
+        SC_Login_RSP,
+        
+        CS_CreateAccount_REQ,
+        SC_CreateAccount_RSP,
 
-        CS_Message
-
+        CS_ChatMessage_REQ,
+        SC_ChatMessage_RSP
     }
 }
