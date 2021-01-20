@@ -10,7 +10,7 @@ namespace Server.Core
     {
         public readonly long Id;
         private readonly AsyncTcpConnection m_Connection;
-        private readonly PacketProcessorBase m_PacketProcessor;
+        private readonly ServerPacketProcessor m_PacketProcessor;
         private Session m_Session;
         private bool m_IsDisposed = false;
 
@@ -32,9 +32,7 @@ namespace Server.Core
                     Dispose();
                 },
                 onReceiveCompleted: () => Dispose());
-
-            var packetHandler = new ServerPacketHandler();
-            m_PacketProcessor = new PacketProcessorBase(packetHandler);
+            m_PacketProcessor = new ServerPacketProcessor();
         }
 
         public void Send(ArraySegment<byte> data)

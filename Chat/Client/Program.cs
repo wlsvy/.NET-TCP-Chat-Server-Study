@@ -5,12 +5,13 @@ using System.Text.Json;
 using Client.Core;
 using Shared.Logger;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Client
 {
     class Program
     {
-        public static async Task Main_Bot(TaskCompletionSource tcs)
+        public static void Main_Bot(CancellationTokenSource cts)
         {
             Console.WriteLine("=========================== \n \t Run Client Bot! \n===========================");
 
@@ -22,7 +23,7 @@ namespace Client
             {
                 if (client.TryConnectToServer())
                 {
-
+                    client.RunLoop(cts);
                 }
             }
 

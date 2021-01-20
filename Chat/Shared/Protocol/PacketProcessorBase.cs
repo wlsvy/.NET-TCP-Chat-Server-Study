@@ -37,17 +37,14 @@ namespace Shared.Protocol
             }
         }
 
-        private readonly PacketHandler m_PacketHandler;
         private readonly ConcurrentQueue<Func<Task>> m_HandlerQueue;
         private readonly Barrier m_Barrier;
 
-        public PacketProcessorBase(PacketHandler handler)
+        public PacketProcessorBase()
         {
-            m_PacketHandler = handler ?? throw new ArgumentNullException(nameof(handler));
             m_HandlerQueue = new ConcurrentQueue<Func<Task>>();
         }
 
-        #region Packet Pasers
 
         public int ParseAndHandlePacket(ArraySegment<byte> dataStream)
         {
@@ -68,7 +65,16 @@ namespace Shared.Protocol
             return (PacketHeader.HEADER_SIZE + packetHeader.BodySize);
         }
 
-        public async Task ProcessHandlers()
+        protected abstract void ParseAndHandleBody(PacketHeader header, ArraySegment<byte> body);
+
+        //TODO 여기 레이스 컨디션 테스트 해보기
+        protected void RunOrReserveHandler(Func<Task> handler)
+        {
+            m_HandlerQueue.Enqueue(handler);
+            _ = ProcessHandlers();
+        }
+
+        private async Task ProcessHandlers()
         {
             if (!m_Barrier.TryEnter())
             {
@@ -81,6 +87,15 @@ namespace Shared.Protocol
             }
             m_Barrier.TryExit();
         }
+
+        #region Packet Handlers
+
+        protected virtual void HANDLE_SC_Ping_NTF(long sequenceNumber) { }
+        protected virtual void HANDLE_CS_Pong_NTF(long sequenceNumber) { }
+
+        #endregion   
+
+        #region Packet Paser Method
 
         private static PacketHeader ParseHeader(ArraySegment<byte> dataStream)
         {
@@ -123,46 +138,5 @@ namespace Shared.Protocol
 
         #endregion
 
-        
-
-        #region Packet Parse And Handle Methods
-
-        private void ParseAndHandleBody(PacketHeader header, ArraySegment<byte> body)
-        {
-            switch (header.Protocol)
-            {
-                case PacketProtocol.SC_Ping_NTF: ParseAndHandle_SC_Ping(body); break;
-            }
-        }
-
-        private void ParseAndHandle_SC_Ping(ArraySegment<byte> body)
-        {
-            using (var reader = new BinaryDecoder(body))
-            {
-                reader.Read(out long sequenceNumber);
-
-                RunOrReserveHandler(handler: async () =>
-                {
-                    m_PacketHandler.HANDLE_SC_Ping_NTF(sequenceNumber);
-                });
-            }
-        }
-
-        //TODO 여기 레이스 컨디션 테스트 해보기
-        private void RunOrReserveHandler(Func<Task> handler)
-        {
-            m_HandlerQueue.Enqueue(handler);
-            _ = ProcessHandlers();
-        }
-
-        #endregion
-
-        #region Packet Handlers
-
-        protected virtual void HANDLE_SC_Ping_NTF(long sequenceNumber) { }
-
-        #endregion   
-
-        
     }
 }

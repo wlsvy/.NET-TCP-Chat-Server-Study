@@ -25,7 +25,7 @@ namespace Server.Core
             return m_Sessions.TryGetValue(id, out session);
         }
 
-        public async Task RemoveSession(long id)
+        public void RemoveSession(long id)
         {
             if(!m_Sessions.TryRemove(id, out var session))
             {

@@ -75,6 +75,7 @@ namespace Client.Core
 
         public void RunLoop(CancellationTokenSource cts)
         {
+            var timeSlicePerUpdateMSec = m_Config.TimeSlicePerUpdateMSec;
             while (!cts.IsCancellationRequested)
             {
 
