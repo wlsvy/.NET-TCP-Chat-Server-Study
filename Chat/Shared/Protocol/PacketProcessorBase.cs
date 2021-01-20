@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Protocol
 {
-    public sealed class PacketProcessor
+    public abstract class PacketProcessorBase
     {
         public struct Barrier
         {
@@ -41,11 +41,13 @@ namespace Shared.Protocol
         private readonly ConcurrentQueue<Func<Task>> m_HandlerQueue;
         private readonly Barrier m_Barrier;
 
-        public PacketProcessor(PacketHandler handler)
+        public PacketProcessorBase(PacketHandler handler)
         {
             m_PacketHandler = handler ?? throw new ArgumentNullException(nameof(handler));
             m_HandlerQueue = new ConcurrentQueue<Func<Task>>();
         }
+
+        #region Packet Pasers
 
         public int ParseAndHandlePacket(ArraySegment<byte> dataStream)
         {
@@ -66,12 +68,18 @@ namespace Shared.Protocol
             return (PacketHeader.HEADER_SIZE + packetHeader.BodySize);
         }
 
-        public async Task ProcessHandler()
+        public async Task ProcessHandlers()
         {
+            if (!m_Barrier.TryEnter())
+            {
+                return;
+            }
+
             while (m_HandlerQueue.TryDequeue(out var handler))
             {
                 await handler.Invoke();
             }
+            m_Barrier.TryExit();
         }
 
         private static PacketHeader ParseHeader(ArraySegment<byte> dataStream)
@@ -113,11 +121,17 @@ namespace Shared.Protocol
             return new ArraySegment<byte>(dataStream.Array, dataStream.Offset + PacketHeader.HEADER_SIZE, packetHeader.BodySize);
         }
 
+        #endregion
+
+        
+
+        #region Packet Parse And Handle Methods
+
         private void ParseAndHandleBody(PacketHeader header, ArraySegment<byte> body)
         {
             switch (header.Protocol)
             {
-                case PacketProtocol.SC_Ping_NTF: return;
+                case PacketProtocol.SC_Ping_NTF: ParseAndHandle_SC_Ping(body); break;
             }
         }
 
@@ -138,13 +152,17 @@ namespace Shared.Protocol
         private void RunOrReserveHandler(Func<Task> handler)
         {
             m_HandlerQueue.Enqueue(handler);
-
-            if (m_Barrier.TryEnter())
-            {
-                ProcessHandler();
-
-                m_Barrier.TryExit();
-            }
+            _ = ProcessHandlers();
         }
+
+        #endregion
+
+        #region Packet Handlers
+
+        protected virtual void HANDLE_SC_Ping_NTF(long sequenceNumber) { }
+
+        #endregion   
+
+        
     }
 }

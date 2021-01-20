@@ -10,7 +10,7 @@ namespace Server.Core
     {
         public readonly long Id;
         private readonly AsyncTcpConnection m_Connection;
-        private readonly PacketProcessor m_PacketProcessor;
+        private readonly PacketProcessorBase m_PacketProcessor;
         private Session m_Session;
         private bool m_IsDisposed = false;
 
@@ -34,7 +34,7 @@ namespace Server.Core
                 onReceiveCompleted: () => Dispose());
 
             var packetHandler = new ServerPacketHandler();
-            m_PacketProcessor = new PacketProcessor(packetHandler);
+            m_PacketProcessor = new PacketProcessorBase(packetHandler);
         }
 
         public void Send(ArraySegment<byte> data)
@@ -65,10 +65,13 @@ namespace Server.Core
             try
             {
                 int consumedBytes = 0;
-                var leftBuffer = new ArraySegment<byte>(
-                    receivedBytes.Array, 
+                do
+                {
+                    var leftBuffer = new ArraySegment<byte>(
+                    receivedBytes.Array,
                     receivedBytes.Offset + totalConsumedByte,
                     receivedBytes.Count - totalConsumedByte);
+                } while (consumedBytes > 0);
             }
             catch(Exception e)
             {
