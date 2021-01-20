@@ -61,10 +61,7 @@ namespace Shared.Network
         private Operating m_Sending;
         private Operating m_Receiving;
 
-        public AsyncTcpConnection(Socket socket) : this(socket, null)
-        {
-
-        }
+        public AsyncTcpConnection(Socket socket) : this(socket, null) { }
 
         public AsyncTcpConnection(Socket socket, Action<Exception> onSendError)
         {

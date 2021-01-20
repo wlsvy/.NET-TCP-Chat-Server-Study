@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
+﻿using Shared.Logger;
 using System;
-using System.Threading;
+using System.Diagnostics;
 using System.Net;
-using Server.Gui;
-using Shared.Logger;
 
 namespace Server.Core
 {

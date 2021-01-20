@@ -1,5 +1,6 @@
 ﻿using Shared.Logger;
 using Shared.Network;
+using Shared.Protocol;
 using System;
 using System.Net.Sockets;
 
@@ -8,22 +9,21 @@ namespace Server.Core
     public sealed class ClientConnection : IDisposable
     {
         public readonly long Id;
-        //public readonly SCPacketSender PacketSender;
+        private readonly AsyncTcpConnection m_Connection;
+        private readonly PacketProcessor m_PacketProcessor;
         private Session m_Session;
-        private AsyncTcpConnection m_Connection;
         private bool m_IsDisposed = false;
 
         public ClientConnection(long id, Socket tcpSocket, SessionManager sessionManager)
         {
-            if(tcpSocket == null ||
-                tcpSocket.Connected == false)
+            _ = tcpSocket ?? throw new ArgumentNullException(nameof(tcpSocket));
+            if (tcpSocket.Connected == false)
             {
                 throw new ArgumentException(nameof(tcpSocket));
             }
 
             Id = id;
-            //PacketSender = new SCPacketSender();
-
+            m_Connection = new AsyncTcpConnection(tcpSocket);
             m_Connection.Subscribe(
                 onReceived: HandleReceivedData,
                 onError: error =>
@@ -32,6 +32,9 @@ namespace Server.Core
                     Dispose();
                 },
                 onReceiveCompleted: () => Dispose());
+
+            var packetHandler = new ServerPacketHandler();
+            m_PacketProcessor = new PacketProcessor(packetHandler);
         }
 
         public void Send(ArraySegment<byte> data)
@@ -41,11 +44,7 @@ namespace Server.Core
 
         public void BoundToSession(Session session)
         {
-            if(session == null)
-            {
-                throw new ArgumentNullException(nameof(session));
-            }
-            m_Session = session;
+            m_Session = session ?? throw new ArgumentNullException(nameof(session));
         }
 
         public void Dispose()

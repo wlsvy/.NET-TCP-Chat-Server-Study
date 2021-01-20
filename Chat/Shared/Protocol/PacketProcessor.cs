@@ -11,9 +11,9 @@ namespace Shared.Protocol
     public sealed class PacketProcessor
     {
         private ConcurrentQueue<Func<Task>> m_HandlerQueue;
-        private IPacketHandler m_PacketHandler;
+        private PacketHandler m_PacketHandler;
 
-        public PacketProcessor(IPacketHandler handler)
+        public PacketProcessor(PacketHandler handler)
         {
             m_PacketHandler = handler ?? throw new ArgumentNullException(nameof(handler));
         }
