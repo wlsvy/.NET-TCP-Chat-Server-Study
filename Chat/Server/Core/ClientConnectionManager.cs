@@ -71,15 +71,7 @@ namespace Server.Core
         {
             long id = m_ClientConnectionIdGenerator.Generate();
             var connection = new ClientConnection(id, socket, m_SessionManager);
-
-            if(!m_Connections.TryAdd(id, connection))
-            {
-                throw new Exception($"{nameof(ClientConnectionManager)}.{nameof(OnNewConnection)} 중복되는 {nameof(ClientConnection.Id)} 가 나타났습니다.");
-                connection.Dispose();
-                return;
-            }
-
-            connection.StartReceive();
+            m_Connections.TryAdd(id, connection);
         }
     }
 }

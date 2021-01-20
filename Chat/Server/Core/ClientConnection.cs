@@ -34,14 +34,9 @@ namespace Server.Core
                 onReceiveCompleted: () => Dispose());
         }
 
-        public void StartReceive()
+        public void Send(ArraySegment<byte> data)
         {
-
-        }
-
-        public void Send()
-        {
-
+            m_Connection.Send(data);
         }
 
         public void BoundToSession(Session session)
