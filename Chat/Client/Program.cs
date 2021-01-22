@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Client.Core;
+using Shared.Logger;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
-using Client.Core;
-using Shared.Logger;
-using System.Threading.Tasks;
 using System.Threading;
 
 namespace Client
