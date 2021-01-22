@@ -1,5 +1,4 @@
-﻿using Client.Core;
-using Shared.Logger;
+﻿using Shared.Logger;
 using System;
 using System.IO;
 using System.Reflection;
@@ -18,7 +17,7 @@ namespace Client
 
             InitializeSingleton();
 
-            using (var client = new Core.Client(config))
+            using (var client = new Client(config))
             {
                 if (client.TryConnectToServer())
                 {
@@ -40,7 +39,7 @@ namespace Client
 
             InitializeSingleton();
 
-            using (var client = new Core.Client(config))
+            using (var client = new Client(config))
             {
                 if (client.TryConnectToServer())
                 {

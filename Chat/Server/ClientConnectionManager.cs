@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace Server.Core
+namespace Server
 {
     public sealed class ClientConnectionManager : IDisposable
     {

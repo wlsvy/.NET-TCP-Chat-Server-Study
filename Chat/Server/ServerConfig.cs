@@ -1,4 +1,4 @@
-﻿namespace Server.Core
+﻿namespace Server
 {
     public sealed class ServerConfig
     {

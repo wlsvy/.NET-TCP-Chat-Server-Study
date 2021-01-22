@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 
-namespace Server.Core
+namespace Server
 {
     public sealed class Server : IDisposable
     {

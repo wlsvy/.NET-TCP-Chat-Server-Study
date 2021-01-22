@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Shared.Logger;
+using System;
 using System.Collections.Concurrent;
-using Shared.Logger;
 
-namespace Server.Core
+namespace Server
 {
     public sealed class SessionManager
     {

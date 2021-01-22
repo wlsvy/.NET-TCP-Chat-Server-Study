@@ -1,5 +1,4 @@
 ﻿using System;
-using Server.Core;
 using System.Text.Json;
 using System.IO;
 using System.Reflection;
@@ -19,7 +18,7 @@ namespace Server
             var config = LoadServerConfig();
             InitializeSingleton();
 
-            using (var server = new Core.Server(config))
+            using (var server = new Server(config))
             {
                 server.Start();
 

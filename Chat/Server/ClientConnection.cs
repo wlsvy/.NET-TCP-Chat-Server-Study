@@ -2,22 +2,19 @@
 using Shared.Network;
 using Shared.Protocol;
 using System;
-using System.Net;
 using System.Net.Sockets;
 
-namespace Client.Core
+namespace Server
 {
-    public sealed class ServerConnection : IDisposable
+    public sealed class ClientConnection : IDisposable
     {
+        public readonly long Id;
         private readonly AsyncTcpConnection m_Connection;
-        private readonly ClientPacketProcessor m_PacketProcessor;
-        public readonly IPAddress ServerIp;
-        public readonly EndPoint RemoteEndPoint;
-        public readonly Socket ConnectSocket;
+        private readonly ServerPacketProcessor m_PacketProcessor;
+        private Session m_Session;
+        private bool m_IsDisposed = false;
 
-        private bool m_IsDisposed;
-
-        public ServerConnection(Socket tcpSocket)
+        public ClientConnection(long id, Socket tcpSocket, SessionManager sessionManager)
         {
             _ = tcpSocket ?? throw new ArgumentNullException(nameof(tcpSocket));
             if (tcpSocket.Connected == false)
@@ -25,6 +22,7 @@ namespace Client.Core
                 throw new ArgumentException(nameof(tcpSocket));
             }
 
+            Id = id;
             m_Connection = new AsyncTcpConnection(tcpSocket);
             m_Connection.Subscribe(
                 onReceived: HandleReceivedData,
@@ -34,12 +32,17 @@ namespace Client.Core
                     Dispose();
                 },
                 onReceiveCompleted: () => Dispose());
-            m_PacketProcessor = new ClientPacketProcessor();
+            m_PacketProcessor = new ServerPacketProcessor();
         }
 
         public void Send(ArraySegment<byte> data)
         {
             m_Connection.Send(data);
+        }
+
+        public void BoundToSession(Session session)
+        {
+            m_Session = session ?? throw new ArgumentNullException(nameof(session));
         }
 
         public void Dispose()
@@ -50,6 +53,7 @@ namespace Client.Core
             }
             m_IsDisposed = true;
 
+            m_Session.OnDisconnected();
         }
 
         private int HandleReceivedData(ArraySegment<byte> receivedBytes)
@@ -67,7 +71,7 @@ namespace Client.Core
                     receivedBytes.Count - totalConsumedByte);
                 } while (consumedBytes > 0);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Log.I.Error($"패킷 처리 중 오류가 발생했습니다.", e);
                 Dispose();

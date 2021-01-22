@@ -7,7 +7,7 @@ using Shared.Logger;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace Client.Core
+namespace Client
 {
     public sealed class Client : IDisposable
     {

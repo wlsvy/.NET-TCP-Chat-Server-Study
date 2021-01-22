@@ -3,19 +3,19 @@ using Shared.Network;
 using Shared.Protocol;
 using System;
 
-namespace Client.Core
+namespace Server
 {
-    public sealed class ClientPacketProcessor : PacketProcessorBase
+    public sealed class ServerPacketProcessor : PacketProcessorBase
     {
         protected override void ParseAndHandleBody(PacketHeader header, ArraySegment<byte> body)
         {
             switch (header.Protocol)
             {
-                case PacketProtocol.SC_Ping_NTF: ParseAndHandle_SC_Ping_NTF(body); break;
+                case PacketProtocol.CS_Pong_NTF: ParseAndHandle_CS_Pong_NTF(body); break;
             }
         }
 
-        private void ParseAndHandle_SC_Ping_NTF(ArraySegment<byte> body)
+        private void ParseAndHandle_CS_Pong_NTF(ArraySegment<byte> body)
         {
             using (var reader = new BinaryDecoder(body))
             {
@@ -23,14 +23,14 @@ namespace Client.Core
 
                 RunOrReserveHandler(handler: async () =>
                 {
-                    HANDLE_SC_Ping_NTF(sequenceNumber);
+                    HANDLE_CS_Pong_NTF(sequenceNumber);
                 });
             }
         }
 
-        protected override void HANDLE_SC_Ping_NTF(long sequenceNumber)
+        protected override void HANDLE_CS_Pong_NTF(long sequenceNumber)
         {
-            Log.I.Info($"Network Pong : {sequenceNumber}");
+            Log.I.Info($"Network Ping : {sequenceNumber}");
         }
     }
 }

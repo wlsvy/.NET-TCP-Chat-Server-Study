@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Server.Core
+namespace Server
 {
     public sealed class Session : IDisposable
     {
