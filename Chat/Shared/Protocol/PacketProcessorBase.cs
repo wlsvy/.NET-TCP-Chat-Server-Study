@@ -88,13 +88,6 @@ namespace Shared.Protocol
             m_Barrier.TryExit();
         }
 
-        #region Packet Handlers
-
-        protected virtual void HANDLE_SC_Ping_NTF(long sequenceNumber) { }
-        protected virtual void HANDLE_CS_Pong_NTF(long sequenceNumber) { }
-
-        #endregion   
-
         #region Packet Paser Method
 
         private static PacketHeader ParseHeader(ArraySegment<byte> dataStream)
