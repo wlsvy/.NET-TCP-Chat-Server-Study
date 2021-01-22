@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Veldrid;
 
-namespace Shared.Util
+namespace Shared.Gui
 {
     public static class GuiUtil
     {

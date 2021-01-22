@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -13,5 +13,21 @@
     <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
   </ItemGroup>
+  
+    <ItemGroup>
+    <EmbeddedResource Include="../Resources/Shaders/GLSL/imgui-vertex.glsl" LogicalName="imgui-vertex.glsl" Link="Gui\Shader\imgui-vertex.glsl" />
+    <EmbeddedResource Include="../Resources/Shaders/GLSL/imgui-frag.glsl" LogicalName="imgui-frag.glsl" Link="Gui\Shader\imgui-frag.glsl" />
+    <EmbeddedResource Include="../Resources/Shaders/HLSL/imgui-vertex.hlsl.bytes" LogicalName="imgui-vertex.hlsl.bytes" Link="Gui\Shader\imgui-vertex.hlsl.bytes" />
+    <EmbeddedResource Include="../Resources/Shaders/HLSL/imgui-frag.hlsl.bytes" LogicalName="imgui-frag.hlsl.bytes" Link="Gui\Shader\imgui-frag.hlsl.bytes" />
+    <EmbeddedResource Include="../Resources/Shaders/SPIR-V/imgui-vertex.spv" LogicalName="imgui-vertex.spv" Link="Gui\Shader\imgui-vertex.spv" />
+    <EmbeddedResource Include="../Resources/Shaders/SPIR-V/imgui-frag.spv" LogicalName="imgui-frag.spv" Link="Gui\Shader\imgui-frag.spv" />
+    <EmbeddedResource Include="../Resources/Shaders/Metal/imgui-vertex.metallib" LogicalName="imgui-vertex.metallib" Link="Gui\Shader\imgui-vertex.metallib" />
+    <EmbeddedResource Include="../Resources/Shaders/Metal/imgui-frag.metallib" LogicalName="imgui-frag.metallib" Link="Gui\Shader\imgui-frag.metallib" />
+  </ItemGroup>
+  
+    <ItemGroup>
+      <Folder Include="Gui\Shader\" />
+    </ItemGroup>
+  
 
 </Project>

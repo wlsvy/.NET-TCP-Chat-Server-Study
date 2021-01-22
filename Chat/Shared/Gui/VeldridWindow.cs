@@ -3,10 +3,9 @@ using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 using System;
 using ImGuiNET;
-using Shared.Util;
 using Shared.Logger;
 
-namespace Server.Gui
+namespace Shared.Gui
 {
     public sealed class VeldridWindow : IDisposable
     {

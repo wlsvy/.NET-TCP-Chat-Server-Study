@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Diagnostics;
 using System.Threading;
-using Server.Gui;
+using Shared.Gui;
 using Shared.Logger;
 
 namespace Server
