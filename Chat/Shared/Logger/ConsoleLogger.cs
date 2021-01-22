@@ -1,5 +1,4 @@
-﻿using Shared.Interface;
-using System;
+﻿using System;
 using System.Threading;
 
 namespace Shared.Logger

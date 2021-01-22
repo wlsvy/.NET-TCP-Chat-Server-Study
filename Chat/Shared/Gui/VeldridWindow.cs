@@ -4,6 +4,7 @@ using Veldrid.StartupUtilities;
 using System;
 using ImGuiNET;
 using Shared.Logger;
+using System.Collections.Generic;
 
 namespace Shared.Gui
 {
@@ -13,7 +14,7 @@ namespace Shared.Gui
         {
             get
             {
-                if(m_Window == null)
+                if (m_Window == null)
                 {
                     return false;
                 }
@@ -25,6 +26,7 @@ namespace Shared.Gui
         private GraphicsDevice m_GraphicsDevice;
         private CommandList m_CommandList;
         private ImguiManager m_ImguiManager;
+        private List<IImguiRenderer> m_UiRenderers = new List<IImguiRenderer>();
 
         private bool m_IsDisposed = false;
 
@@ -53,23 +55,34 @@ namespace Shared.Gui
                     m_Window.Width,
                     m_Window.Height);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Log.I.Error("Veldrid Window 열기 실패", e);
                 Dispose();
             }
-            
+
         }
 
         public void Update(int deltaMSec)
         {
             OnRenderBegin(deltaMSec);
 
-            ImGui.Begin("Hello World");
-            ImGui.End();
-            ImGui.ShowDemoWindow();
-
+            RenderMainMenuBar();
+            foreach (var renderer in m_UiRenderers)
+            {
+                renderer.Render();
+            }
             Submit();
+        }
+
+        public void AddImguiRenderer(IImguiRenderer renderer)
+        {
+            m_UiRenderers.Add(renderer);
+        }
+
+        public void ClearRenderers()
+        {
+            m_UiRenderers.Clear();
         }
 
         public void Dispose()
@@ -79,11 +92,12 @@ namespace Shared.Gui
                 return;
             }
 
+            m_UiRenderers.Clear();
             m_GraphicsDevice?.WaitForIdle();
             m_ImguiManager?.Dispose();
             m_CommandList?.Dispose();
             m_GraphicsDevice?.Dispose();
-            if(m_Window != null)
+            if (m_Window != null)
             {
                 m_Window.Resized -= OnWindowResize;
                 m_Window.Close();
@@ -106,6 +120,25 @@ namespace Shared.Gui
 
             m_CommandList.SetFramebuffer(m_GraphicsDevice.MainSwapchain.Framebuffer);
             m_CommandList.ClearColorTarget(0, GuiUtil.WINDOW_BACKGROUND_COLOR);
+        }
+
+        private void RenderMainMenuBar()
+        {
+            if (ImGui.BeginMainMenuBar())
+            {
+                if (ImGui.BeginMenu("Windows"))
+                {
+                    foreach (var renderer in m_UiRenderers)
+                    {
+                        if (ImGui.MenuItem(renderer.WindowName))
+                        {
+                            renderer.IsOpen = !renderer.IsOpen;
+                        }
+                    }
+                    ImGui.EndMenu();
+                }
+            }
+            ImGui.EndMainMenuBar();
         }
 
         private void Submit()

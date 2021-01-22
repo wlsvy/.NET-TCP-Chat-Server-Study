@@ -58,6 +58,7 @@ namespace Server
 
             timer.Start();
             veldridWindow.Open();
+            veldridWindow.AddImguiRenderer(new ImguiDemoWindow());
 
             while (true)
             {

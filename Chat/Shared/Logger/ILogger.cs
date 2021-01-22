@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shared.Interface
+namespace Shared.Logger
 {
     public interface ILogger
     {

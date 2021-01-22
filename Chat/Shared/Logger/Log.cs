@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Shared.Util;
+using System;
 using System.Collections.Generic;
-using Shared.Interface;
-using Shared.Util;
 
 namespace Shared.Logger
 {

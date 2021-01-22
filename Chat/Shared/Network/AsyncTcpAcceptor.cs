@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Shared.Logger;
+using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using Shared.Logger;
-using Shared.Interface;
-using System.Diagnostics;
 
 namespace Shared.Network
 {
