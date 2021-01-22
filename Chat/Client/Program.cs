@@ -1,5 +1,7 @@
-﻿using Shared.Logger;
+﻿using Shared.Gui;
+using Shared.Logger;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
@@ -43,7 +45,7 @@ namespace Client
             {
                 if (client.TryConnectToServer())
                 {
-                    
+                    client.RunLoop();
                 }
             }
 

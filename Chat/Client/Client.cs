@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Shared.Logger;
 using System.Threading.Tasks;
 using System.Threading;
+using Shared.Gui;
 
 namespace Client
 {
@@ -70,7 +71,36 @@ namespace Client
         public void RunLoop()
         {
             var timeSlicePerUpdateMSec = m_Config.TimeSlicePerUpdateMSec;
-            //while
+            var timer = new Stopwatch();
+            var veldridWindow = new VeldridWindow();
+            var elapsedTimeMSec = 0L;
+
+            timer.Start();
+            veldridWindow.Open();
+
+            while (true)
+            {
+                var currentElapsedTime = timer.ElapsedMilliseconds;
+                var deltaTimeMSec = currentElapsedTime - elapsedTimeMSec;
+                elapsedTimeMSec = currentElapsedTime;
+
+                if (veldridWindow.IsWindowExist)
+                {
+                    veldridWindow.Update((int)deltaTimeMSec);
+                }
+                else
+                {
+                    break;
+                }
+
+                var updateConsumedTime = timer.ElapsedMilliseconds - elapsedTimeMSec;
+                var sleepTime = timeSlicePerUpdateMSec - updateConsumedTime;
+                if (sleepTime > 0)
+                {
+                    Thread.Sleep((int)sleepTime);
+                }
+            }
+            veldridWindow.Dispose();
         }
 
         public void RunLoop(CancellationTokenSource cts)
@@ -78,13 +108,8 @@ namespace Client
             var timeSlicePerUpdateMSec = m_Config.TimeSlicePerUpdateMSec;
             while (!cts.IsCancellationRequested)
             {
-
+                Thread.Sleep(TimeSpan.FromSeconds(1000));
             }
-        }
-
-        private void Update()
-        {
-
         }
     }
 }
