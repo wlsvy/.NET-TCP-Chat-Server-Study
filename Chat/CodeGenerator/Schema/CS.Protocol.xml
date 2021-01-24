@@ -2,5 +2,9 @@
 
 <ContentsGroup name="ClientToServer">
 
+  <Protocol name ="Login">
+    <Parameter type="string" name="id"/>
+    <Parameter type="string" name="password"/>
+  </Protocol>
   
 </ContentsGroup>
