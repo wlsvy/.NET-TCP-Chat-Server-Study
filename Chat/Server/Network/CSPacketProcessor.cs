@@ -5,15 +5,15 @@ using System;
 
 namespace Server.Network
 {
-    public sealed class ServerPacketProcessor : PacketProcessorBase, ICSPacketHandler
+    public sealed class CSPacketProcessor : PacketProcessorBase, ICSPacketHandler
     {
         protected override void ParseAndHandleBody(PacketHeader header, ArraySegment<byte> body)
         {
             switch (header.Protocol)
             {
                 case PacketProtocol.CS_Pong_NTF: ParseAndHandle_CS_Pong_NTF(body); break;
-                case PacketProtocol.CS_Login_REQ: ParseAndHandle_CS_Pong_NTF(body); break;
-                case PacketProtocol.CS_CreateAccount_REQ: ParseAndHandle_CS_Pong_NTF(body); break;
+                case PacketProtocol.CS_Login_REQ: ParseAndHandle_CS_Login_REQ(body); break;
+                case PacketProtocol.CS_CreateAccount_REQ: ParseAndHandle_CS_CreateAccount_REQ(body); break;
             }
         }
 

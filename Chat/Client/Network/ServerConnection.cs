@@ -9,7 +9,10 @@ namespace Client.Network
     public sealed class ServerConnection : IDisposable
     {
         private readonly AsyncTcpConnection m_Connection;
-        private readonly ClientPacketProcessor m_PacketProcessor;
+        private readonly SCPacketProcessor m_PacketProcessor;
+        private readonly CSPacketSender m_PacketSender;
+        public CSPacketSender PacketSender => m_PacketSender;
+
         public readonly IPAddress ServerIp;
         public readonly EndPoint RemoteEndPoint;
         public readonly Socket ConnectSocket;
@@ -33,12 +36,8 @@ namespace Client.Network
                     Dispose();
                 },
                 onReceiveCompleted: () => Dispose());
-            m_PacketProcessor = new ClientPacketProcessor();
-        }
-
-        public void Send(ArraySegment<byte> data)
-        {
-            m_Connection.Send(data);
+            m_PacketProcessor = new SCPacketProcessor();
+            m_PacketSender = new CSPacketSender(m_Connection);
         }
 
         public void Dispose()

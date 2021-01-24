@@ -5,7 +5,7 @@ using System;
 
 namespace Client.Network
 {
-    public sealed class ClientPacketProcessor : PacketProcessorBase, ISCPacketHandler
+    public sealed class SCPacketProcessor : PacketProcessorBase, ISCPacketHandler
     {
         protected override void ParseAndHandleBody(PacketHeader header, ArraySegment<byte> body)
         {

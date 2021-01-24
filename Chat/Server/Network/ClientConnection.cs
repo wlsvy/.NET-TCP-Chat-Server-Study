@@ -10,7 +10,10 @@ namespace Server.Network
     {
         public readonly long Id;
         private readonly AsyncTcpConnection m_Connection;
-        private readonly ServerPacketProcessor m_PacketProcessor;
+        private readonly CSPacketProcessor m_PacketProcessor;
+        private readonly SCPacketSender m_PacketSender;
+        public SCPacketSender PacketSender => m_PacketSender;
+
         private Session m_Session;
         private bool m_IsDisposed = false;
 
@@ -32,12 +35,8 @@ namespace Server.Network
                     Dispose();
                 },
                 onReceiveCompleted: () => Dispose());
-            m_PacketProcessor = new ServerPacketProcessor();
-        }
-
-        public void Send(ArraySegment<byte> data)
-        {
-            m_Connection.Send(data);
+            m_PacketProcessor = new CSPacketProcessor();
+            m_PacketSender = new SCPacketSender(m_Connection);
         }
 
         public void BoundToSession(Session session)
