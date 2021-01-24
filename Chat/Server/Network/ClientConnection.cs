@@ -68,6 +68,9 @@ namespace Server.Network
                     receivedBytes.Array,
                     receivedBytes.Offset + totalConsumedByte,
                     receivedBytes.Count - totalConsumedByte);
+
+                    consumedBytes = m_PacketProcessor.ParseAndHandlePacket(leftBuffer);
+                    totalConsumedByte += consumedBytes;
                 } while (consumedBytes > 0);
             }
             catch(Exception e)

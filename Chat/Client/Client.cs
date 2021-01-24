@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using Shared.Gui;
 using Client.Network;
+using Shared.Protocol;
+using System.Collections.Concurrent;
 
 namespace Client
 {
@@ -18,6 +20,10 @@ namespace Client
         private readonly Stopwatch m_Timer = new Stopwatch();
 
         private ServerConnection m_ServerConnection;
+        private readonly ConcurrentDictionary<PacketProtocol, TaskCompletionSource> m_UnresolvedRpcRequests = new ConcurrentDictionary<PacketProtocol, TaskCompletionSource>();
+
+        private long m_LinkedAccountId = 0;
+        public long LinkedAccountId => m_LinkedAccountId;
 
         public Client(ClientConfig config)
         {
@@ -113,9 +119,22 @@ namespace Client
             }
         }
 
-        public void RequestCreateAccount(string id, string password)
+        public async Task RequestCreateAccount(string id, string password)
         {
+            var tcs = new TaskCompletionSource();
+            if (!m_UnresolvedRpcRequests.TryAdd(PacketProtocol.CS_CreateAccount_REQ, tcs))
+            {
+                Log.I.Warn($"중복된 REQ 수행 시도, {nameof(RequestCreateAccount)}");
+                return;
+            }
 
+            m_ServerConnection.PacketSender.SEND_CS_CreateAccount_REQ(id, password);
+            //m_LinkedAccountId = await tcs.Task;
+
+            if (!m_UnresolvedRpcRequests.TryRemove(PacketProtocol.CS_CreateAccount_REQ, out _))
+            {
+                Log.I.Warn($"REQ 정보 삭제 실패, 비정상 동작, {nameof(RequestCreateAccount)}");
+            }
         }
 
         public void RequestLogin(string id, string password)

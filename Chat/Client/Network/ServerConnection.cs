@@ -13,10 +13,6 @@ namespace Client.Network
         private readonly CSPacketSender m_PacketSender;
         public CSPacketSender PacketSender => m_PacketSender;
 
-        public readonly IPAddress ServerIp;
-        public readonly EndPoint RemoteEndPoint;
-        public readonly Socket ConnectSocket;
-
         private bool m_IsDisposed;
 
         public ServerConnection(Socket tcpSocket)
@@ -48,6 +44,7 @@ namespace Client.Network
             }
             m_IsDisposed = true;
 
+            m_Connection.Dispose();
         }
 
         private int HandleReceivedData(ArraySegment<byte> receivedBytes)
@@ -63,6 +60,9 @@ namespace Client.Network
                     receivedBytes.Array,
                     receivedBytes.Offset + totalConsumedByte,
                     receivedBytes.Count - totalConsumedByte);
+
+                    consumedBytes = m_PacketProcessor.ParseAndHandlePacket(leftBuffer);
+                    totalConsumedByte += consumedBytes;
                 } while (consumedBytes > 0);
             }
             catch (Exception e)

@@ -2,11 +2,24 @@
 using Shared.Network;
 using Shared.Protocol;
 using System;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Client.Network
 {
     public sealed class SCPacketProcessor : PacketProcessorBase, ISCPacketHandler
     {
+        private ConcurrentQueue<Func<Task>> m_ReservedNetworkHandler = new ConcurrentQueue<Func<Task>>();
+
+        public async Task Update()
+        {
+            while(m_ReservedNetworkHandler.TryDequeue(out var handler))
+            {
+                await handler.Invoke();
+            }
+        }
+
         protected override void ParseAndHandleBody(PacketHeader header, ArraySegment<byte> body)
         {
             switch (header.Protocol)
@@ -24,7 +37,7 @@ namespace Client.Network
             {
                 reader.Read(out long sequenceNumber);
 
-                RunOrReserveHandler(handler: async () =>
+                m_ReservedNetworkHandler.Enqueue(async () =>
                 {
                     HANDLE_SC_Ping_NTF(sequenceNumber);
                 });
@@ -37,7 +50,7 @@ namespace Client.Network
             {
                 reader.Read(out long accountId);
 
-                RunOrReserveHandler(handler: async () =>
+                m_ReservedNetworkHandler.Enqueue(async () =>
                 {
                     HANDLE_SC_Login_RSP(accountId);
                 });
@@ -50,7 +63,7 @@ namespace Client.Network
             {
                 reader.Read(out long accountId);
 
-                RunOrReserveHandler(handler: async () =>
+                m_ReservedNetworkHandler.Enqueue(async () =>
                 {
                     HANDLE_SC_CreateAccount_RSP(accountId);
                 });
@@ -65,6 +78,7 @@ namespace Client.Network
         private void HANDLE_SC_Login_RSP(long accountId)
         {
             Log.I.Info($"Network HANDLE_SC_Login_RSP : {accountId}");
+            
         }
 
         private void HANDLE_SC_CreateAccount_RSP(long accountId)
