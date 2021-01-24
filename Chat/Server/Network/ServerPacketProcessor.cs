@@ -3,7 +3,7 @@ using Shared.Network;
 using Shared.Protocol;
 using System;
 
-namespace Server
+namespace Server.Network
 {
     public sealed class ServerPacketProcessor : PacketProcessorBase, ICSPacketHandler
     {

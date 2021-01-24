@@ -3,7 +3,7 @@ using Shared.Network;
 using Shared.Protocol;
 using System;
 
-namespace Client
+namespace Client.Network
 {
     public sealed class ClientPacketProcessor : PacketProcessorBase, ISCPacketHandler
     {
@@ -14,6 +14,7 @@ namespace Client
                 case PacketProtocol.SC_Ping_NTF: ParseAndHandle_SC_Ping_NTF(body); break;
                 case PacketProtocol.SC_Login_RSP: ParseAndHandle_SC_Login_RSP(body); break;
                 case PacketProtocol.SC_CreateAccount_RSP: ParseAndHandle_SC_CreateAccount_RSP(body); break;
+                default: throw new NotImplementedException();
             }
         }
 

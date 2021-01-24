@@ -7,6 +7,7 @@ using Shared.Logger;
 using System.Threading.Tasks;
 using System.Threading;
 using Shared.Gui;
+using Client.Network;
 
 namespace Client
 {
@@ -106,11 +107,20 @@ namespace Client
 
         public void RunLoop(CancellationTokenSource cts)
         {
-            var timeSlicePerUpdateMSec = m_Config.TimeSlicePerUpdateMSec;
             while (!cts.IsCancellationRequested)
             {
                 Thread.Sleep(TimeSpan.FromSeconds(1000));
             }
+        }
+
+        public void RequestCreateAccount(string id, string password)
+        {
+
+        }
+
+        public void RequestLogin(string id, string password)
+        {
+
         }
     }
 }
