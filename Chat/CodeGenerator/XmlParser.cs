@@ -27,28 +27,26 @@ namespace CodeGenerator
                 {
                     throw new NotImplementedException();
                 }
-                var groupName = element.Attribute(name)?.Value;
-                switch (groupName)
-                {
-                    case serverToClient: ParseProtocol(path, element); break;
-                    case clientToServer: ParseProtocol(path, element); break;
-                    default: throw new NotImplementedException();
-                }
+                var groupName = element.Attribute(ProtocolContent.ContentsGroupAttribue.name.ToString())?.Value;
+
             }
         }
 
         private static void ParseProtocol(string path, XElement protocols)
         {
+            var protocolContentsList = new List<ProtocolContent>();
             foreach (var protocol in protocols.Elements())
             {
-                var protocolName = protocol.Attribute("name").Value;
+                var protocolName = protocol.Attribute(ProtocolContent.ProtocolAttribute.name.ToString()).Value;
+                var direction = protocol.Attribute(ProtocolContent.ProtocolAttribute.direction.ToString()).Value;
                 var paramList = new List<(Type paramType, string paramName)>();
                 foreach(var param in protocol.Elements())
                 {
-                    var paramTypeName = param.Attribute("type").Value;
-                    var paramName = param.Attribute("name").Value;
+                    var paramTypeName = param.Attribute(ProtocolContent.ParameterAttribute.type.ToString()).Value;
+                    var paramName = param.Attribute(ProtocolContent.ParameterAttribute.name.ToString()).Value;
                     paramList.Add((Type.GetType(paramTypeName), paramName));
                 }
+                protocolContentsList.Add(new ProtocolContent(protocolName, direction, paramList));
             }
         }
     }

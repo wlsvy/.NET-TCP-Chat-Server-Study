@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
-<ContentsGroup name="ClientToServer">
+<ContentsGroup name="Protocol">
 
-  <Protocol name ="Login">
+  <Protocol name ="Login" direction="CS">
     <Parameter type="string" name="id"/>
     <Parameter type="string" name="password"/>
   </Protocol>
