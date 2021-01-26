@@ -16,12 +16,22 @@ namespace CodeGenerator
 
         public static void ToNetworkMessage(string path, XDocument doc)
         {
+            const string contentsGroup = "ContentsGroup";
+            const string name = "name";
+            const string serverToClient = "ServerToClient";
+            const string clientToServer = "ClientToServer";
+
             foreach (var element in doc.Elements())
             {
-                switch (element.Name.LocalName)
+                if(element.Name.LocalName != contentsGroup)
                 {
-                    case "ServerToClient": ParseProtocol(path, element); break;
-                    case "ClientToServer": ParseProtocol(path, element); break;
+                    throw new NotImplementedException();
+                }
+                var groupName = element.Attribute(name)?.Value;
+                switch (groupName)
+                {
+                    case serverToClient: ParseProtocol(path, element); break;
+                    case clientToServer: ParseProtocol(path, element); break;
                     default: throw new NotImplementedException();
                 }
             }
@@ -29,16 +39,15 @@ namespace CodeGenerator
 
         private static void ParseProtocol(string path, XElement protocols)
         {
-            //var content = new ProtocolContent
-            var elements = protocols.Elements();
             foreach (var protocol in protocols.Elements())
             {
+                var protocolName = protocol.Attribute("name").Value;
                 var paramList = new List<(Type paramType, string paramName)>();
                 foreach(var param in protocol.Elements())
                 {
-                    var typeName = param.Name.NamespaceName;
-                    var paramName = param.Name.LocalName;
-                    paramList.Add((Type.GetType(param.Name.NamespaceName), param.Name.LocalName));
+                    var paramTypeName = param.Attribute("type").Value;
+                    var paramName = param.Attribute("name").Value;
+                    paramList.Add((Type.GetType(paramTypeName), paramName));
                 }
             }
         }
