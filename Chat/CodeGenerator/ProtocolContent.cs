@@ -24,9 +24,9 @@ namespace CodeGenerator
 
         public readonly string ProtocolName;
         public readonly ProtocolDirection Direction;
-        public readonly (Type paramType, string paramName)[] Parameters;
+        public readonly (string paramType, string paramName)[] Parameters;
 
-        public ProtocolContent(string name, ProtocolDirection direction, (Type paramType, string paramName)[] parameters)
+        public ProtocolContent(string name, ProtocolDirection direction, (string paramType, string paramName)[] parameters)
         {
             ProtocolName = name;
             Direction = direction;

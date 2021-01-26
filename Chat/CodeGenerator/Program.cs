@@ -11,7 +11,7 @@ namespace CodeGenerator
         static void Main(string[] args)
         {
             var docs = LoadXml();
-            var protocolsContents = XmlParser.ToNetworkMessage(docs);
+            var protocolsContents = ProtocolContentParser.Parse(docs);
             
         }
 
