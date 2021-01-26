@@ -6,39 +6,48 @@ namespace CodeGenerator
 {
     internal static class XmlParser
     {
-        public static void ToNetworkMessage(IReadOnlyCollection<(string path, XDocument doc)> list)
+        public static IReadOnlyList<ProtocolContent> ToNetworkMessage(IReadOnlyCollection<(string path, XDocument doc)> list)
         {
-            foreach(var (path, doc) in list)
+            var protocolContents = new List<ProtocolContent>();
+
+            foreach (var (path, doc) in list)
             {
-                ToNetworkMessage(path, doc);
+                var contents = ToNetworkMessage(path, doc);
+                protocolContents.AddRange(contents);
             }
+            return protocolContents;
         }
 
-        public static void ToNetworkMessage(string path, XDocument doc)
+        public static IReadOnlyList<ProtocolContent> ToNetworkMessage(string path, XDocument doc)
         {
             const string contentsGroup = "ContentsGroup";
-            const string name = "name";
-            const string serverToClient = "ServerToClient";
-            const string clientToServer = "ClientToServer";
+            var protocolContents = new List<ProtocolContent>();
 
             foreach (var element in doc.Elements())
             {
-                if(element.Name.LocalName != contentsGroup)
+                if (element.Name.LocalName != contentsGroup)
                 {
                     throw new NotImplementedException();
                 }
-                var groupName = element.Attribute(ProtocolContent.ContentsGroupAttribue.name.ToString())?.Value;
 
+                var groupName = element.Attribute(ContentsGroupAttribue.name.ToString())?.Value;
+                if(groupName != ContentsGroupType.Protocol.ToString())
+                {
+                    throw new NotImplementedException();
+                }
+                protocolContents.AddRange(ParseProtocol(element));
             }
+            return protocolContents;
         }
 
-        private static void ParseProtocol(string path, XElement protocols)
+        private static IReadOnlyList<ProtocolContent> ParseProtocol(XElement protocols)
         {
-            var protocolContentsList = new List<ProtocolContent>();
+            var protocolContents = new List<ProtocolContent>();
             foreach (var protocol in protocols.Elements())
             {
                 var protocolName = protocol.Attribute(ProtocolContent.ProtocolAttribute.name.ToString()).Value;
-                var direction = protocol.Attribute(ProtocolContent.ProtocolAttribute.direction.ToString()).Value;
+                var directionValue = protocol.Attribute(ProtocolContent.ProtocolAttribute.direction.ToString()).Value;
+                var direction = CodeGenUtil.GetDirection(directionValue);
                 var paramList = new List<(Type paramType, string paramName)>();
                 foreach(var param in protocol.Elements())
                 {
@@ -46,8 +55,9 @@ namespace CodeGenerator
                     var paramName = param.Attribute(ProtocolContent.ParameterAttribute.name.ToString()).Value;
                     paramList.Add((Type.GetType(paramTypeName), paramName));
                 }
-                protocolContentsList.Add(new ProtocolContent(protocolName, direction, paramList));
+                protocolContents.Add(new ProtocolContent(protocolName, direction, paramList.ToArray()));
             }
+            return protocolContents;
         }
     }
 }

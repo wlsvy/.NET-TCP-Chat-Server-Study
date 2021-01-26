@@ -1,12 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeGenerator
 {
-    internal static class CodoGenUtil
+    public enum ContentsGroupAttribue
+    {
+        name,
+    }
+    public enum ContentsGroupType
+    {
+        Protocol
+    }
+
+    internal static class CodeGenUtil
     {
         public static ProtocolContent.ProtocolDirection GetDirection(string direction)
         {

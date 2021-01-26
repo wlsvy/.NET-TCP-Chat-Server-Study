@@ -4,10 +4,7 @@ namespace CodeGenerator
 {
     internal readonly struct ProtocolContent
     {
-        public enum ContentsGroupAttribue
-        {
-            name,
-        }
+        
         public enum ProtocolAttribute
         {
             name,
@@ -18,7 +15,7 @@ namespace CodeGenerator
             type,
             name,
         }
-
+        
         public enum ProtocolDirection
         {
             CS,
