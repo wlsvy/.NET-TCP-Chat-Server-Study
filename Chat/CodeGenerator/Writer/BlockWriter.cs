@@ -61,17 +61,26 @@ namespace CodeGenerator.Writer
             return new BlockWriter(context);
         }
 
-        public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name, CodeGenParam p)
+        public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name, string baseInit, params CodeGenParam[] parameters)
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
-
-
+            if (string.IsNullOrEmpty(baseInit))
+            {
+                context.AppendLine($"{accessModifier.String()}{name}({parameters.Concat()})");
+            }
+            else
+            {
+                context.AppendLine($"{accessModifier.String()}{name}({parameters.Concat()}) : {baseInit}");
+            }
             return new BlockWriter(context);
         }
 
-        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, string name)
+        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, string ret, MethodModifier methodModifier, string name, params CodeGenParam[] parameters)
         {
+            _ = name ?? throw new ArgumentNullException(nameof(name));
+
+            context.AppendLine($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({parameters.Concat()})");
             return new BlockWriter(context);
         }
 
@@ -81,7 +90,11 @@ namespace CodeGenerator.Writer
             return new BlockWriter(context);
         }
 
-
+        public static BlockWriter If(CodeGenContext context, string condition)
+        {
+            context.AppendLine($"if({condition})");
+            return new BlockWriter(context);
+        }
 
 
 

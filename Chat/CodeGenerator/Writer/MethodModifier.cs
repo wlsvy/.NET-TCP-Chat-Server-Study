@@ -17,11 +17,11 @@ namespace CodeGenerator.Writer
         public static string String(this MethodModifier methodModifier) => methodModifier switch
         {
             MethodModifier.Empty => string.Empty,
-            MethodModifier.Abstract => "abstract",
-            MethodModifier.Override => "sealed",
-            MethodModifier.New => "new",
-            MethodModifier.Sealed => "sealed",
-            MethodModifier.Static => "static",
+            MethodModifier.Abstract => "abstract ",
+            MethodModifier.Override => "sealed ",
+            MethodModifier.New => "new ",
+            MethodModifier.Sealed => "sealed ",
+            MethodModifier.Static => "static ",
             _ => throw new ArgumentOutOfRangeException(nameof(methodModifier)),
         };
     }

@@ -9,7 +9,7 @@ namespace Launcher
 {
     static class Program
     {
-        public const string ROOT_DIRECTORY_NAME = ".NET-TCP-Chat-Server-Study";
+        public const string ROOT_DIRECTORY_NAME = "Chat";
 
         static void Main(string[] args)
         {
@@ -26,8 +26,8 @@ Launcher Start
                 return;
             }
 
-            var serverProjectPath = Path.Combine(directory.FullName, "Chat", "Server");
-            var clientProjectPath = Path.Combine(directory.FullName, "Chat", "Client");
+            var serverProjectPath = Path.Combine(directory.FullName, "Server");
+            var clientProjectPath = Path.Combine(directory.FullName, "Client");
 
             var serverExecutable = Directory.GetFiles(serverProjectPath, "Server.exe", SearchOption.AllDirectories);
             var clientExecutable = Directory.GetFiles(clientProjectPath, "Client.exe", SearchOption.AllDirectories);
