@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CodeGenerator
+namespace CodeGenerator.Protocol
 {
     internal readonly struct ProtocolContent
     {

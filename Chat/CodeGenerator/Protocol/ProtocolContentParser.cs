@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace CodeGenerator
+namespace CodeGenerator.Protocol
 {
     internal static class ProtocolContentParser
     {
