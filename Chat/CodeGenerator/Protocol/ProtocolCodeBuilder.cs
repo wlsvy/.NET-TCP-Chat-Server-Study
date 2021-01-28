@@ -18,13 +18,13 @@ namespace CodeGenerator.Protocol
 
             foreach(var group in groups)
             {
-                result.Add(BuildPacketProtocol(protocolContents, group.Key));
+                result.Add(BuildPacketProtocol(group, group.Key));
             }
 
             return result;
         }
 
-        private static CodeGenContext BuildPacketProtocol(IReadOnlyList<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        private static CodeGenContext BuildPacketProtocol(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
             var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
             var typename = $"Test{direction}PacketProtocol";
