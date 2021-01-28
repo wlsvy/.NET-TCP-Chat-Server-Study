@@ -1,5 +1,6 @@
 ﻿using System;
 using CodeGenerator.Protocol;
+using System.IO;
 
 namespace CodeGenerator.Helper
 {
@@ -19,6 +20,24 @@ namespace CodeGenerator.Helper
             {
                 throw new ArgumentException(direction);
             }
+        }
+
+        public static string GetNamespaceFromDirectory(string directoryPath)
+        {
+            var pos = directoryPath.IndexOf(Global.ROOT_DIRECTORY_NAME);
+            if(pos == -1)
+            {
+                return null;
+            }
+
+            pos += Global.ROOT_DIRECTORY_NAME.Length;
+            pos += 1; //구분자 포함.
+            if(pos >= directoryPath.Length)
+            {
+                return null;
+            }
+
+            return directoryPath.Substring(pos).Replace("\\", ".");
         }
     }
 }

@@ -4,7 +4,7 @@
     {
         public static void UsingNamespace(CodeGenContext context, string nameSpace)
         {
-            context.AppendLine($"using {nameSpace}");
+            context.AppendLine($"using {nameSpace};");
         }
 
         public static void LineSpace(CodeGenContext context)

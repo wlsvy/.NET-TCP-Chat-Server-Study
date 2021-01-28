@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodeGenerator.Helper;
 using CodeGenerator.Writer;
 
 namespace CodeGenerator.Protocol
@@ -27,10 +29,11 @@ namespace CodeGenerator.Protocol
         private static CodeGenContext BuildPacketProtocol(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
             var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
-            var typename = $"Test{direction}PacketProtocol";
+            var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
+            var typename = $"{direction}PacketProtocol";
             var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{typename}.cs");
 
-            using (var n = BlockWriter.Namespace(result, "Shared.Protocol"))
+            using (var n = BlockWriter.Namespace(result, directoryNamespace))
             {
                 using (var e = BlockWriter.Enum(result, AccessModifier.Public, typename, "byte"))
                 {
