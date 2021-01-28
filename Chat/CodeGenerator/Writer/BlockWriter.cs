@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeGenerator.Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,7 +32,7 @@ namespace CodeGenerator.Writer
             _ = name ?? throw new ArgumentNullException(nameof(name));
             type = string.IsNullOrEmpty(type) ? string.Empty : $" : {type}";
 
-            context.AppendLine($"{accessModifier.String()} enum {name} {type}");
+            context.AppendLine($"{accessModifier.String()}enum {name} {type}");
             return new BlockWriter(context);
         }
 
@@ -39,15 +40,7 @@ namespace CodeGenerator.Writer
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
-            string declarationStr;
-            if(classModifier == ClassModifier.Empty)
-            {
-                declarationStr = $"{accessModifier.String()} class {name}";
-            }
-            else
-            {
-                declarationStr = $"{accessModifier.String()} {classModifier.String()} class {name}";
-            }
+            string declarationStr = $"{accessModifier.String()}{classModifier.String()}class {name}";
 
             if (bases.Length > 0)
             {
@@ -68,8 +61,12 @@ namespace CodeGenerator.Writer
             return new BlockWriter(context);
         }
 
-        public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name)
+        public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name, CodeGenParam p)
         {
+            _ = name ?? throw new ArgumentNullException(nameof(name));
+
+
+
             return new BlockWriter(context);
         }
 
@@ -80,7 +77,7 @@ namespace CodeGenerator.Writer
 
         public static BlockWriter Interface(CodeGenContext context, AccessModifier accessModifier, string name)
         {
-            context.AppendLine($"{accessModifier.String()} interface {name}");
+            context.AppendLine($"{accessModifier.String()}interface {name}");
             return new BlockWriter(context);
         }
 

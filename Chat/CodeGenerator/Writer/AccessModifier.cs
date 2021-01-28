@@ -2,7 +2,7 @@
 
 namespace CodeGenerator.Writer
 {
-    public enum AccessModifier : byte
+    internal enum AccessModifier : byte
     {
         Public,
         Private,
