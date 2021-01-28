@@ -2,8 +2,19 @@
 
 <ContentsGroup name="Protocol">
 
+  <Protocol name ="Pong" direction="SC">
+    <Parameter type="long" name="sequenceNumber"/>
+  </Protocol>
+
   <Protocol name ="Login" direction="SC">
     <Parameter type="long" name="linkedAccountId"/>
   </Protocol>
 
+  <Protocol name ="CreateAccount" direction="SC">
+    <Parameter type="long" name="linkedAccountId"/>
+  </Protocol>
+
+  <Protocol name ="ChatMessage" direction="SC">
+  </Protocol>
+  
 </ContentsGroup>

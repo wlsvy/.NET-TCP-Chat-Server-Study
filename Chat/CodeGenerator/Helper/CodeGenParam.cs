@@ -6,14 +6,12 @@ namespace CodeGenerator.Helper
     {
         public readonly string TypeName;
         public readonly string ParameterName;
-        public readonly string ParameterModifier;
         public readonly string DefaultValue;
 
-        public CodeGenParam(string typeName, string paramName, string paramModifier = null, string defaultValue = null)
+        public CodeGenParam(string typeName, string paramName, string defaultValue = null)
         {
             TypeName = typeName;
             ParameterName = paramName;
-            ParameterModifier = paramModifier ?? string.Empty;
             DefaultValue = defaultValue ?? string.Empty;
         }
 
@@ -21,18 +19,15 @@ namespace CodeGenerator.Helper
         {
             if (string.IsNullOrEmpty(DefaultValue))
             {
-                return $"{TypeName} {ParameterModifier}{ParameterName}";
+                return $"{TypeName} {ParameterName}";
             }
             else
             {
-                return $"{TypeName} {ParameterModifier}{ParameterName} = {DefaultValue}";
+                return $"{TypeName} {ParameterName} = {DefaultValue}";
             }
         }
-    }
 
-    internal static class ParameterExtension
-    {
-        public static string Concat(this CodeGenParam[] parameters)
+        public static string Concat(CodeGenParam[] parameters)
         {
             var builder = new StringBuilder();
             for (int i = 0; i < parameters.Length; i++)

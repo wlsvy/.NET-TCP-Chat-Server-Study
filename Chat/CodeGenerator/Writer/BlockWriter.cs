@@ -30,7 +30,7 @@ namespace CodeGenerator.Writer
         public static BlockWriter Enum(CodeGenContext context, AccessModifier accessModifier, string name, string type = null)
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
-            type = string.IsNullOrEmpty(type) ? string.Empty : $" : {type}";
+            type = string.IsNullOrEmpty(type) ? string.Empty : $": {type}";
 
             context.AppendLine($"{accessModifier.String()}enum {name} {type}");
             return new BlockWriter(context);
@@ -67,11 +67,11 @@ namespace CodeGenerator.Writer
 
             if (string.IsNullOrEmpty(baseInit))
             {
-                context.AppendLine($"{accessModifier.String()}{name}({parameters.Concat()})");
+                context.AppendLine($"{accessModifier.String()}{name}({CodeGenParam.Concat(parameters)})");
             }
             else
             {
-                context.AppendLine($"{accessModifier.String()}{name}({parameters.Concat()}) : {baseInit}");
+                context.AppendLine($"{accessModifier.String()}{name}({CodeGenParam.Concat(parameters)}) : {baseInit}");
             }
             return new BlockWriter(context);
         }
@@ -80,7 +80,7 @@ namespace CodeGenerator.Writer
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
-            context.AppendLine($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({parameters.Concat()})");
+            context.AppendLine($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({CodeGenParam.Concat(parameters)})");
             return new BlockWriter(context);
         }
 

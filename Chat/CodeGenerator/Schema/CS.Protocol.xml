@@ -2,9 +2,22 @@
 
 <ContentsGroup name="Protocol">
 
+  <Protocol name ="Ping" direction="CS">
+    <Parameter type="long" name="sequenceNumber"/>
+  </Protocol>
+
   <Protocol name ="Login" direction="CS">
     <Parameter type="string" name="id"/>
     <Parameter type="string" name="password"/>
+  </Protocol>
+  
+  <Protocol name ="CreateAccount" direction="CS">
+    <Parameter type="string" name="id"/>
+    <Parameter type="string" name="password"/>
+  </Protocol>
+
+  <Protocol name ="ChatMessage" direction="CS">
+    <Parameter type="string" name="message"/>
   </Protocol>
   
 </ContentsGroup>
