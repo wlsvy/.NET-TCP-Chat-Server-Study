@@ -1,6 +1,5 @@
-﻿using System;
-using CodeGenerator.Protocol;
-using System.IO;
+﻿using CodeGenerator.Protocol;
+using System;
 
 namespace CodeGenerator.Helper
 {
