@@ -1,4 +1,5 @@
 ﻿using System;
+using CodeGenerator.Protocol;
 
 namespace CodeGenerator
 {

@@ -30,6 +30,11 @@ namespace CodeGenerator
             m_Tap--;
         }
 
+
+        public void Append(string value)
+        {
+            m_StringBuilder.Append(value);
+        }
         public void AppendLine(string line)
         {
             for(int i = 0; i < m_Tap; i++)
