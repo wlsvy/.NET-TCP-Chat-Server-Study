@@ -1,4 +1,4 @@
-﻿using CodeGenerator.Helper;
+﻿using CodeGenerator.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,26 +61,26 @@ namespace CodeGenerator.Writer
             return new BlockWriter(context);
         }
 
-        public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name, string baseInit, params CodeGenParam[] parameters)
+        public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name, string baseInit, params ProtocolParameter[] parameters)
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
             if (string.IsNullOrEmpty(baseInit))
             {
-                context.AppendLine($"{accessModifier.String()}{name}({CodeGenParam.Concat(parameters)})");
+                context.AppendLine($"{accessModifier.String()}{name}({ProtocolParameter.Concat(parameters)})");
             }
             else
             {
-                context.AppendLine($"{accessModifier.String()}{name}({CodeGenParam.Concat(parameters)}) : {baseInit}");
+                context.AppendLine($"{accessModifier.String()}{name}({ProtocolParameter.Concat(parameters)}) : {baseInit}");
             }
             return new BlockWriter(context);
         }
 
-        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, string ret, MethodModifier methodModifier, string name, params CodeGenParam[] parameters)
+        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, string ret, MethodModifier methodModifier, string name, params ProtocolParameter[] parameters)
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
-            context.AppendLine($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({CodeGenParam.Concat(parameters)})");
+            context.AppendLine($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({ProtocolParameter.Concat(parameters)})");
             return new BlockWriter(context);
         }
 

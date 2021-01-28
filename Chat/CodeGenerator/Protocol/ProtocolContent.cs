@@ -1,6 +1,4 @@
-﻿using CodeGenerator.Helper;
-
-namespace CodeGenerator.Protocol
+﻿namespace CodeGenerator.Protocol
 {
     internal readonly struct ProtocolContent
     {
@@ -25,9 +23,9 @@ namespace CodeGenerator.Protocol
 
         public readonly string ProtocolName;
         public readonly ProtocolDirection Direction;
-        public readonly CodeGenParam[] Parameters;
+        public readonly ProtocolParameter[] Parameters;
 
-        public ProtocolContent(string name, ProtocolDirection direction, params CodeGenParam[] parameters)
+        public ProtocolContent(string name, ProtocolDirection direction, params ProtocolParameter[] parameters)
         {
             ProtocolName = name;
             Direction = direction;

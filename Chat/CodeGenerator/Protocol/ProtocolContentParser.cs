@@ -49,12 +49,12 @@ namespace CodeGenerator.Protocol
                 var protocolName = protocol.Attribute(ProtocolContent.ProtocolAttribute.name.ToString()).Value;
                 var directionValue = protocol.Attribute(ProtocolContent.ProtocolAttribute.direction.ToString()).Value;
                 var direction = CodeGenUtil.GetDirection(directionValue);
-                var paramList = new List<CodeGenParam>();
+                var paramList = new List<ProtocolParameter>();
                 foreach (var param in protocol.Elements())
                 {
                     var paramTypeName = param.Attribute(ProtocolContent.ParameterAttribute.type.ToString()).Value;
                     var paramName = param.Attribute(ProtocolContent.ParameterAttribute.name.ToString()).Value;
-                    paramList.Add(new CodeGenParam(paramTypeName, paramName));
+                    paramList.Add(new ProtocolParameter(paramTypeName, paramName));
                 }
                 protocolContents.Add(new ProtocolContent(protocolName, direction, paramList.ToArray()));
             }

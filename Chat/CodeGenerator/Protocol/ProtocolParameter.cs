@@ -1,14 +1,14 @@
 ﻿using System.Text;
 
-namespace CodeGenerator.Helper
+namespace CodeGenerator.Protocol
 {
-    internal struct CodeGenParam
+    internal struct ProtocolParameter
     {
         public readonly string TypeName;
         public readonly string ParameterName;
         public readonly string DefaultValue;
 
-        public CodeGenParam(string typeName, string paramName, string defaultValue = null)
+        public ProtocolParameter(string typeName, string paramName, string defaultValue = null)
         {
             TypeName = typeName;
             ParameterName = paramName;
@@ -27,7 +27,7 @@ namespace CodeGenerator.Helper
             }
         }
 
-        public static string Concat(CodeGenParam[] parameters)
+        public static string Concat(ProtocolParameter[] parameters)
         {
             var builder = new StringBuilder();
             for (int i = 0; i < parameters.Length; i++)

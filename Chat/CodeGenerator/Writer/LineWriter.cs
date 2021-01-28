@@ -1,4 +1,4 @@
-﻿using CodeGenerator.Helper;
+﻿using CodeGenerator.Protocol;
 
 namespace CodeGenerator.Writer
 {
@@ -26,9 +26,9 @@ namespace CodeGenerator.Writer
             context.AppendLine(string.Empty);
         }
 
-        public static void InterfaceMethod(CodeGenContext context, string returnType, string name, params CodeGenParam[] parameters)
+        public static void InterfaceMethod(CodeGenContext context, string returnType, string name, params ProtocolParameter[] parameters)
         {
-            context.AppendLine($"{returnType} {name}({CodeGenParam.Concat(parameters)});");
+            context.AppendLine($"{returnType} {name}({ProtocolParameter.Concat(parameters)});");
         }
     }
 }
