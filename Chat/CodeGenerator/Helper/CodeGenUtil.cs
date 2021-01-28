@@ -1,22 +1,13 @@
 ﻿using System;
 using CodeGenerator.Protocol;
 
-namespace CodeGenerator
+namespace CodeGenerator.Helper
 {
-    public enum ContentsGroupAttribue
-    {
-        name,
-    }
-    public enum ContentsGroupType
-    {
-        Protocol
-    }
-
     internal static class CodeGenUtil
     {
         public static ProtocolContent.ProtocolDirection GetDirection(string direction)
         {
-            if(direction == ProtocolContent.ProtocolDirection.CS.ToString())
+            if (direction == ProtocolContent.ProtocolDirection.CS.ToString())
             {
                 return ProtocolContent.ProtocolDirection.CS;
             }
