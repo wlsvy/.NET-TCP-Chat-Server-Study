@@ -25,7 +25,7 @@ namespace Server.Network
 
                 RunOrReserveHandler(handler: async () =>
                 {
-                    HANDLE_CS_Pong_NTF(sequenceNumber);
+                    HANDLE_CS_Ping(sequenceNumber);
                 });
             }
         }
@@ -39,7 +39,7 @@ namespace Server.Network
 
                 RunOrReserveHandler(handler: async () =>
                 {
-                    HANDLE_CS_Login_REQ(id, password);
+                    HANDLE_CS_Login(id, password);
                 });
             }
         }
@@ -53,24 +53,29 @@ namespace Server.Network
 
                 RunOrReserveHandler(handler: async () =>
                 {
-                    HANDLE_CS_CreateAccount_REQ(id, password);
+                    HANDLE_CS_CreateAccount(id, password);
                 });
             }
         }
 
-        private void HANDLE_CS_Pong_NTF(long sequenceNumber)
+        public void HANDLE_CS_Ping(long sequenceNumber)
         {
             Log.I.Info($"Network Ping : {sequenceNumber}");
         }
 
-        private void HANDLE_CS_Login_REQ(string id, string password)
+        public void HANDLE_CS_Login(string id, string password)
         {
             Log.I.Info($"id {id}, password {password}");
         }
 
-        private void HANDLE_CS_CreateAccount_REQ(string id, string password)
+        public void HANDLE_CS_CreateAccount(string id, string password)
         {
             Log.I.Info($"id {id}, password {password}");
+        }
+
+        public void HANDLE_CS_ChatMessage(string message)
+        {
+
         }
     }
 }

@@ -24,14 +24,14 @@ namespace Client.Network
         {
             switch (header.Protocol)
             {
-                case PacketProtocol.SC_Ping_NTF: ParseAndHandle_SC_Ping_NTF(body); break;
+                case PacketProtocol.SC_Ping_NTF: ParseAndHandle_SC_Pong(body); break;
                 case PacketProtocol.SC_Login_RSP: ParseAndHandle_SC_Login_RSP(body); break;
                 case PacketProtocol.SC_CreateAccount_RSP: ParseAndHandle_SC_CreateAccount_RSP(body); break;
                 default: throw new NotImplementedException();
             }
         }
 
-        private void ParseAndHandle_SC_Ping_NTF(ArraySegment<byte> body)
+        private void ParseAndHandle_SC_Pong(ArraySegment<byte> body)
         {
             using (var reader = new BinaryDecoder(body))
             {
@@ -39,7 +39,7 @@ namespace Client.Network
 
                 m_ReservedNetworkHandler.Enqueue(async () =>
                 {
-                    HANDLE_SC_Ping_NTF(sequenceNumber);
+                    HANDLE_SC_Pong(sequenceNumber);
                 });
             }
         }
@@ -52,7 +52,7 @@ namespace Client.Network
 
                 m_ReservedNetworkHandler.Enqueue(async () =>
                 {
-                    HANDLE_SC_Login_RSP(accountId);
+                    HANDLE_SC_Login(accountId);
                 });
             }
         }
@@ -65,25 +65,30 @@ namespace Client.Network
 
                 m_ReservedNetworkHandler.Enqueue(async () =>
                 {
-                    HANDLE_SC_CreateAccount_RSP(accountId);
+                    HANDLE_SC_CreateAccount(accountId);
                 });
             }
         }
 
-        private void HANDLE_SC_Ping_NTF(long sequenceNumber)
+        public void HANDLE_SC_Pong(long sequenceNumber)
         {
             Log.I.Info($"Network Pong : {sequenceNumber}");
         }
 
-        private void HANDLE_SC_Login_RSP(long accountId)
+        public void HANDLE_SC_Login(long accountId)
         {
             Log.I.Info($"Network HANDLE_SC_Login_RSP : {accountId}");
             
         }
 
-        private void HANDLE_SC_CreateAccount_RSP(long accountId)
+        public void HANDLE_SC_CreateAccount(long accountId)
         {
             Log.I.Info($"Network HANDLE_SC_CreateAccount_RSP : {accountId}");
+        }
+
+        public void HANDLE_SC_ChatMessage()
+        {
+
         }
     }
 }

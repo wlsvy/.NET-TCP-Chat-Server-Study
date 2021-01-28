@@ -1,11 +1,8 @@
-﻿using System;
+﻿using CodeGenerator.Helper;
+using CodeGenerator.Writer;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CodeGenerator.Helper;
-using CodeGenerator.Writer;
 
 namespace CodeGenerator.Protocol
 {
@@ -21,6 +18,7 @@ namespace CodeGenerator.Protocol
             foreach(var group in groups)
             {
                 result.Add(BuildPacketProtocol(group, group.Key));
+                result.Add(BuildPacketHandlerInterface(group, group.Key));
             }
 
             return result;
@@ -30,18 +28,40 @@ namespace CodeGenerator.Protocol
         {
             var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
-            var typename = $"{direction}PacketProtocol";
-            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{typename}.cs");
+            var newTypename = $"{direction}PacketProtocol";
+            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
 
+            LineWriter.CodeGenCaption(result);
             using (var n = BlockWriter.Namespace(result, directoryNamespace))
             {
-                using (var e = BlockWriter.Enum(result, AccessModifier.Public, typename, "byte"))
+                using (var e = BlockWriter.Enum(result, AccessModifier.Public, newTypename, "byte"))
                 {
-                    result.AppendLine($"Invalid,");
-
+                    LineWriter.Line(result, $"Invalid,");
+                    LineWriter.LineSpace(result);
                     foreach (var p in protocolContents)
                     {
-                        result.AppendLine($"{direction}_{p.ProtocolName},");
+                        LineWriter.Line(result, $"{direction}_{p.ProtocolName},");
+                    }
+                }
+            }
+            return result;
+        }
+
+        private static CodeGenContext BuildPacketHandlerInterface(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        {
+            var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
+            var newTypename = $"I{direction}PacketHandler";
+            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+
+            LineWriter.CodeGenCaption(result);
+            using (var n = BlockWriter.Namespace(result, directoryNamespace))
+            {
+                using (var e = BlockWriter.Interface(result, AccessModifier.Public, newTypename))
+                {
+                    foreach (var p in protocolContents)
+                    {
+                        LineWriter.InterfaceMethod(result, "void", $"HANDLE_{direction}_{p.ProtocolName}", p.Parameters);
                     }
                 }
             }
