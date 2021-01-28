@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodeGenerator.Writer;
 
 namespace CodeGenerator.Protocol
 {
@@ -11,38 +12,37 @@ namespace CodeGenerator.Protocol
         public static IReadOnlyList<CodeGenContext> GenerateCode(IReadOnlyList<ProtocolContent> protocolContents)
         {
             var result = new List<CodeGenContext>();
-            result.AddRange(BuildPacketProtocol(protocolContents));
+
+            var groups = from p in protocolContents
+                         group p by p.Direction;
+
+            foreach(var group in groups)
+            {
+                result.Add(BuildPacketProtocol(protocolContents, group.Key));
+            }
 
             return result;
         }
 
-        private static IReadOnlyList<CodeGenContext> BuildPacketProtocol(IReadOnlyList<ProtocolContent> protocolContents)
+        private static CodeGenContext BuildPacketProtocol(IReadOnlyList<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
             var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var typename = $"Test{direction}PacketProtocol";
+            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{typename}.cs");
 
-            var csPacketProtocol = new CodeGenContext(directoryPath: protocolPath, fileName: "TestCSPacketProtocol.cs");
-            var scPacketProtocol = new CodeGenContext(directoryPath: protocolPath, fileName: "TestSCPacketProtocol.cs");
-
-            foreach(var content in protocolContents)
+            using (var n = BlockWriter.Namespace(result, "Shared.Protocol"))
             {
-                switch (content.Direction)
+                using (var e = BlockWriter.Enum(result, AccessModifier.Public, typename, "byte"))
                 {
-                    case ProtocolContent.ProtocolDirection.CS: break;
-                    case ProtocolContent.ProtocolDirection.SC: break;
+                    result.AppendLine($"Invalid,");
+
+                    foreach (var p in protocolContents)
+                    {
+                        result.AppendLine($"{direction}_{p.ProtocolName},");
+                    }
                 }
             }
-
-            return new List<CodeGenContext>() { csPacketProtocol, scPacketProtocol };
-
-            void BuildCS(ProtocolContent content)
-            {
-
-            }
-
-            void DoBuild()
-            {
-
-            }
+            return result;
         }
     }
 }

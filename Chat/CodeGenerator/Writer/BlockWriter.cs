@@ -90,6 +90,12 @@ namespace CodeGenerator.Writer
             return new BlockWriter(context);
         }
 
+        public static BlockWriter Namespace(CodeGenContext context, string nameSpace)
+        {
+            context.AppendLine($"namespace {nameSpace}");
+            return new BlockWriter(context);
+        }
+
         public static BlockWriter If(CodeGenContext context, string condition)
         {
             context.AppendLine($"if({condition})");
