@@ -1,5 +1,6 @@
 ﻿using Shared.Logger;
 using Shared.Network;
+using Shared.Protocol;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -32,7 +33,8 @@ namespace Client.Network
                     Dispose();
                 },
                 onReceiveCompleted: () => Dispose());
-            m_PacketProcessor = new SCPacketProcessor();
+            var packetHandler = new SCPacketHandler();
+            m_PacketProcessor = new SCPacketProcessor(packetHandler);
             m_PacketSender = new CSPacketSender(m_Connection);
         }
 

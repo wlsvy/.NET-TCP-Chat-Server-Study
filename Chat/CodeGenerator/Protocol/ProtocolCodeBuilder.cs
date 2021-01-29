@@ -34,7 +34,7 @@ namespace CodeGenerator.Protocol
             LineWriter.CodeGenCaption(result);
             using (var n = BlockWriter.Namespace(result, directoryNamespace))
             {
-                using (var e = BlockWriter.Enum(result, AccessModifier.Public, newTypename, "byte"))
+                using (var e = BlockWriter.Enum(result, AccessModifier.Public, newTypename, "int"))
                 {
                     LineWriter.Line(result, $"Invalid,");
                     LineWriter.LineSpace(result);
