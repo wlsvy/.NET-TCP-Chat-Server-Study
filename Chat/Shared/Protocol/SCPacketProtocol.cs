@@ -3,7 +3,7 @@
 //======================================
 namespace Shared.Protocol
 {
-    public enum SCPacketProtocol : byte
+    public enum SCPacketProtocol : int
     {
         Invalid,
         

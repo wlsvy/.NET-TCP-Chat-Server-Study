@@ -1,7 +1,5 @@
 ﻿using CodeGenerator.Helper;
 using CodeGenerator.Writer;
-using Shared.Network;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -80,21 +78,21 @@ namespace CodeGenerator.Protocol
             var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
 
             LineWriter.CodeGenCaption(result);
-
             LineWriter.LineSpace(result);
 
             LineWriter.UsingNamespace(result, "Shared.Network");
             LineWriter.UsingNamespace(result, "Shared.Util");
             LineWriter.UsingNamespace(result, "System");
+            LineWriter.LineSpace(result);
 
             using (var n = BlockWriter.Namespace(result, directoryNamespace))
             {
                 using (var c = BlockWriter.Class(result, AccessModifier.Internal, ClassModifier.Static, newTypename))
                 {
                     using (var m = BlockWriter.Method(result, AccessModifier.Private, MethodModifier.Static, BaseTypes.VOID, "WriteHeader",
-                        new ProtocolParameter(nameof(BinaryReader), "encoder"),
+                        new ProtocolParameter("BinaryEncoder", "encoder"),
                         new ProtocolParameter(protocolEnumType, "protocol"),
-                        new ProtocolParameter(BaseTypes.INT, "bodysize")))
+                        new ProtocolParameter(BaseTypes.INT, "bodySize")))
                     {
                         LineWriter.Line(result, "encoder.Write(in protocol);");
                         LineWriter.Line(result, "encoder.Write(in bodySize);");
@@ -103,22 +101,30 @@ namespace CodeGenerator.Protocol
 
                     foreach (var p in protocolContents)
                     {
-                        using (var m = BlockWriter.Method(result, AccessModifier.Public, MethodModifier.Static, nameof(ArraySegment<byte>), $"Pack_{direction}_{p.ProtocolName}", p.Parameters))
+                        using (var m = BlockWriter.Method(result, AccessModifier.Public, MethodModifier.Static, "ArraySegment<byte>", $"Pack_{direction}_{p.ProtocolName}", p.Parameters))
                         {
                             LineWriter.Line(result, $"var protocol = {protocolEnumType}.{direction}_{p.ProtocolName};");
 
                             LineWriter.LineSpace(result);
 
-                            LineWriter.Line(result, $"int bodySize = sequenceNum.SizeForWrite();");
-                            LineWriter.Line(result, $"int packetSize = {direction}PacketHeader.HEADER_SIZE + bodySize;");
+                            LineWriter.Line(result, $"int bodySize = 0;");
+                            foreach(var param in p.Parameters)
+                            {
+                                LineWriter.Line(result, $"bodySize += {param.ParameterName}.SizeForWrite();");
+                            }
+                            LineWriter.LineSpace(result);
 
+                            LineWriter.Line(result, $"int packetSize = {direction}PacketHeader.HEADER_SIZE + bodySize;");
                             LineWriter.LineSpace(result);
 
                             LineWriter.Line(result, $"var packetBuffer = new ArraySegment<byte>(new byte[packetSize]);");
-                            using (var u = BlockWriter.Using(result, "encoder", nameof(BinaryEncoder), "packetBuffer"))
+                            using (var u = BlockWriter.Using(result, "encoder", "BinaryEncoder", "packetBuffer"))
                             {
                                 LineWriter.Line(result, $"WriteHeader(encoder, protocol, bodySize);");
-                                LineWriter.Line(result, $"encoder.Write(in sequenceNum);");
+                                foreach (var param in p.Parameters)
+                                {
+                                    LineWriter.Line(result, $"encoder.Write(in {param.ParameterName});");
+                                }
                             }
                             LineWriter.Line(result, $"return packetBuffer;");
                         }
