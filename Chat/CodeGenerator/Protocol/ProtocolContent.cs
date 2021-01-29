@@ -2,7 +2,6 @@
 {
     internal readonly struct ProtocolContent
     {
-        
         public enum ProtocolAttribute
         {
             name,
