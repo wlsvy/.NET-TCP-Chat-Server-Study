@@ -2,7 +2,6 @@
 using Shared.Network;
 using Shared.Protocol;
 using System;
-using System.Net;
 using System.Net.Sockets;
 
 namespace Client.Network

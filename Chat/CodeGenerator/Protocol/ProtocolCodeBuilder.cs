@@ -15,12 +15,13 @@ namespace CodeGenerator.Protocol
             var groups = from p in protocolContents
                          group p by p.Direction;
 
-            foreach(var group in groups)
+            foreach (var group in groups)
             {
                 result.Add(BuildPacketProtocol(group, group.Key));
                 result.Add(BuildPacketHandlerInterface(group, group.Key));
                 result.Add(BuildPacketPacker(group, group.Key));
                 result.Add(BuildPacketProcessor(group, group.Key));
+                result.Add(BuildPacketSender(group, group.Key));
             }
 
             return result;
@@ -63,7 +64,7 @@ namespace CodeGenerator.Protocol
                 {
                     foreach (var p in protocolContents)
                     {
-                        LineWriter.InterfaceMethod(result, BaseTypes.VOID, $"HANDLE_{direction}_{p.ProtocolName}", p.Parameters);
+                        LineWriter.Line(result, $"void HANDLE_{direction}_{p.ProtocolName}({ProtocolParameter.Concat(p.Parameters)});");
                     }
                 }
             }
@@ -109,7 +110,7 @@ namespace CodeGenerator.Protocol
                             LineWriter.LineSpace(result);
 
                             LineWriter.Line(result, $"int bodySize = 0;");
-                            foreach(var param in p.Parameters)
+                            foreach (var param in p.Parameters)
                             {
                                 LineWriter.Line(result, $"bodySize += {param.ParameterName}.SizeForWrite();");
                             }
@@ -169,7 +170,7 @@ namespace CodeGenerator.Protocol
 
                     using (var methodBlock = BlockWriter.Block(result, $"public int ParseAndHandlePacket(ArraySegment<byte> dataStream)"))
                     {
-                        using(var ifBlock = BlockWriter.Block(result, $"if(!HasPacketHeader(dataStream))"))
+                        using (var ifBlock = BlockWriter.Block(result, $"if(!HasPacketHeader(dataStream))"))
                         {
                             LineWriter.Return(result, "0");
                         }
@@ -193,7 +194,7 @@ namespace CodeGenerator.Protocol
                     {
                         using (var switchBlock = BlockWriter.Block(result, "switch (header.Protocol)"))
                         {
-                            foreach(var p in protocolContents)
+                            foreach (var p in protocolContents)
                             {
                                 LineWriter.Line(result, $"case {packetProtocol}.{direction}_{p.ProtocolName}: ParseAndHandle_{direction}_{p.ProtocolName}(body); break;");
                             }
@@ -278,5 +279,50 @@ namespace CodeGenerator.Protocol
             }
             return result;
         }
+
+        private static CodeGenContext BuildPacketSender(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        {
+            var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
+
+            var newTypename = $"{direction}PacketSender";
+            var packetPacker = $"{direction}PacketPacker";
+
+            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+
+            LineWriter.CodeGenCaption(result);
+            LineWriter.LineSpace(result);
+
+            LineWriter.Line(result, "using Shared.Network;");
+            LineWriter.Line(result, "using System;");
+            LineWriter.LineSpace(result);
+
+            using (var namespaceBlock = BlockWriter.Block(result, $"namespace {directoryNamespace}"))
+            {
+                using (var classBlock = BlockWriter.Block(result, $"public sealed class {newTypename}"))
+                {
+                    LineWriter.Line(result, "private AsyncTcpConnection m_Connection;");
+
+                    using (var ctorBlock = BlockWriter.Block(result, $"public {newTypename}(AsyncTcpConnection connection)"))
+                    {
+                        LineWriter.Line(result, "m_Connection = connection ?? throw new ArgumentNullException(nameof(connection));");
+                    }
+                    LineWriter.LineSpace(result);
+
+                    foreach (var p in protocolContents)
+                    {
+                        using (var methodBlock = BlockWriter.Block(result, $"public void SEND_{direction}_{p.ProtocolName}({ProtocolParameter.Concat(p.Parameters)})"))
+                        {
+                            LineWriter.Line(result, $"var packet = {packetPacker}.Pack_{direction}_{p.ProtocolName}({ProtocolParameter.ConcatNames(p.Parameters)});");
+                            LineWriter.Line(result, $"m_Connection.Send(packet);");
+                        }
+                        LineWriter.LineSpace(result);
+                    }
+
+                }
+            }
+            return result;
+        }
+
     }
 }
