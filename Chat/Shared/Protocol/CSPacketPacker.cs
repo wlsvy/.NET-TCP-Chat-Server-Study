@@ -8,7 +8,7 @@ using System;
 
 namespace Shared.Protocol
 {
-    internal static class CSPacketPacker
+    public static class CSPacketPacker
     {
         private static void WriteHeader(BinaryEncoder encoder, CSPacketProtocol protocol, int bodySize)
         {

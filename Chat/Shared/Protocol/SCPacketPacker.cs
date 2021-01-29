@@ -8,7 +8,7 @@ using System;
 
 namespace Shared.Protocol
 {
-    internal static class SCPacketPacker
+    public static class SCPacketPacker
     {
         private static void WriteHeader(BinaryEncoder encoder, SCPacketProtocol protocol, int bodySize)
         {

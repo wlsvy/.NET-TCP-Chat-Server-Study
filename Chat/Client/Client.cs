@@ -20,7 +20,6 @@ namespace Client
         private readonly Stopwatch m_Timer = new Stopwatch();
 
         private ServerConnection m_ServerConnection;
-        private readonly ConcurrentDictionary<PacketProtocol, TaskCompletionSource> m_UnresolvedRpcRequests = new ConcurrentDictionary<PacketProtocol, TaskCompletionSource>();
 
         private long m_LinkedAccountId = 0;
         public long LinkedAccountId => m_LinkedAccountId;

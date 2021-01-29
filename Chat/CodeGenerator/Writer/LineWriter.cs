@@ -39,8 +39,8 @@ namespace CodeGenerator.Writer
         public static void Field(CodeGenContext context, AccessModifier accessModifier, FieldModifier fieldModifier, string typename, string name, string defaultValue = null)
         {
             defaultValue = string.IsNullOrEmpty(defaultValue)
-                ? $" = {defaultValue}"
-                : string.Empty;
+                ? string.Empty
+                : $" = {defaultValue}";
             context.AppendLine($"{accessModifier.String()}{fieldModifier.String()}{typename} {name}{defaultValue};");
         }
 
