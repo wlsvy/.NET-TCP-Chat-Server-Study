@@ -30,5 +30,13 @@ namespace CodeGenerator.Writer
         {
             context.AppendLine($"{returnType} {name}({ProtocolParameter.Concat(parameters)});");
         }
+
+        public static void Field(CodeGenContext context, AccessModifier accessModifier, FieldModifier fieldModifier, string typename, string name, string defaultValue = null)
+        {
+            defaultValue = string.IsNullOrEmpty(defaultValue)
+                ? $" = {defaultValue}"
+                : string.Empty;
+            context.AppendLine($"{accessModifier.String()}{fieldModifier.String()}{typename} {name}{defaultValue};");
+        }
     }
 }

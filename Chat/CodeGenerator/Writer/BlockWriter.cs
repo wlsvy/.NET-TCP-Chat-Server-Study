@@ -98,6 +98,18 @@ namespace CodeGenerator.Writer
             return new BlockWriter(context);
         }
 
+        public static BlockWriter Switch(CodeGenContext context, string expression)
+        {
+            context.AppendLine($"switch ({expression})");
+            return new BlockWriter(context);
+        }
+
+        public static BlockWriter Case(CodeGenContext context, string comparand)
+        {
+            context.AppendLine($"case {comparand}:");
+            return new BlockWriter(context);
+        }
+
         public static BlockWriter Using(CodeGenContext context, string varName, string typename, string parameters)
         {
             context.AppendLine($"using ({BaseTypes.VAR} {varName} = new {typename}({parameters}))");
