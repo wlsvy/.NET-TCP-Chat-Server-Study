@@ -1,14 +1,10 @@
 ﻿using Shared.Network;
-using System;
 using Shared.Util;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 
 namespace Shared.Protocol
 {
-    internal static class CSPacketPacker
+    public static class CSPacketPacker
     {
         private static void WriteHeader(BinaryEncoder encoder, CSPacketProtocol protocol, int bodySize)
         {

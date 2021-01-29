@@ -15,19 +15,19 @@ namespace Client.Network
 
         public void SEND_CS_Pong_NTF(long sequenceNumber)
         {
-            var packet = PacketPacker.Pack_CS_Pong_NTF(sequenceNumber);
+            var packet = CSPacketPacker.Pack_CS_Pong_NTF(sequenceNumber);
             m_Connection.Send(packet);
         }
 
         public void SEND_CS_Login_REQ(string id, string password)
         {
-            var packet = PacketPacker.Pack_CS_Login_REQ(id, password);
+            var packet = CSPacketPacker.Pack_CS_Login_REQ(id, password);
             m_Connection.Send(packet);
         }
 
         public void SEND_CS_CreateAccount_REQ(string id, string password)
         {
-            var packet = PacketPacker.Pack_CS_CreateAccount_REQ(id, password);
+            var packet = CSPacketPacker.Pack_CS_CreateAccount_REQ(id, password);
             m_Connection.Send(packet);
         }
     }

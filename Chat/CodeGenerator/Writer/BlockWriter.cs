@@ -72,7 +72,7 @@ namespace CodeGenerator.Writer
             return new BlockWriter(context);
         }
 
-        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, string ret, MethodModifier methodModifier, string name, params ProtocolParameter[] parameters)
+        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, MethodModifier methodModifier, string ret, string name, params ProtocolParameter[] parameters)
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
@@ -95,6 +95,12 @@ namespace CodeGenerator.Writer
         public static BlockWriter If(CodeGenContext context, string condition)
         {
             context.AppendLine($"if({condition})");
+            return new BlockWriter(context);
+        }
+
+        public static BlockWriter Using(CodeGenContext context, string varName, string typename, string parameters)
+        {
+            context.AppendLine($"using ({BaseTypes.VAR} {varName} = new {typename}({parameters}))");
             return new BlockWriter(context);
         }
 
