@@ -20,6 +20,7 @@ namespace CodeGenerator.Protocol
                 result.Add(BuildPacketProtocol(group, group.Key));
                 result.Add(BuildPacketHandlerInterface(group, group.Key));
                 result.Add(BuildPacketPacker(group, group.Key));
+                result.Add(BuildPacketProcessor(group, group.Key));
             }
 
             return result;
@@ -134,9 +135,150 @@ namespace CodeGenerator.Protocol
             return result;
         }
 
-        private static object CSPacketProtocol()
+        private static CodeGenContext BuildPacketProcessor(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
-            throw new System.NotImplementedException();
+            var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
+
+            var newTypename = $"{direction}PacketProcessor";
+            var packetHandlerInterface = $"I{direction}PacketHandler";
+            var packetHeader = $"{direction}PacketHeader";
+            var packetProtocol = $"{direction}PacketProtocol";
+
+            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+
+            LineWriter.CodeGenCaption(result);
+            LineWriter.LineSpace(result);
+
+            LineWriter.UsingNamespace(result, "Shared.Network");
+            LineWriter.UsingNamespace(result, "System");
+            LineWriter.UsingNamespace(result, "System.Diagnostics");
+            LineWriter.LineSpace(result);
+
+            using (var n = BlockWriter.Namespace(result, directoryNamespace))
+            {
+                using (var c = BlockWriter.Class(result, AccessModifier.Public, ClassModifier.Sealed, newTypename, "PacketProcessorBase"))
+                {
+                    LineWriter.Field(result, AccessModifier.Private, FieldModifier.Readonly, packetHandlerInterface, "m_PacketHandler");
+                    LineWriter.LineSpace(result);
+
+                    using(var constructor = BlockWriter.Constructor(result, AccessModifier.Public, newTypename, null, new ProtocolParameter(packetHandlerInterface, "handler")))
+                    {
+                        LineWriter.Line(result, "m_PacketHandler = handler ?? throw new ArgumentNullException(nameof(handler));");
+                    }
+
+                    using(var m = BlockWriter.Method(result, AccessModifier.Public, MethodModifier.Empty, BaseTypes.INT, "ParseAndHandlePacket", new ProtocolParameter("ArraySegment<byte>", "dataStream")))
+                    {
+                        using(var i = BlockWriter.If(result, $"!HasPacketHeader(dataStream)"))
+                        {
+                            LineWriter.Return(result, "0");
+                        }
+                        LineWriter.LineSpace(result);
+
+                        LineWriter.LocalVariable(result, null, "packetHeader", "ParseHeader(dataStream)");
+                        using(var i = BlockWriter.If(result, $"!HasPacketBody(dataStream, packetHeader)"))
+                        {
+                            LineWriter.Return(result, "0");
+                        }
+                        LineWriter.LineSpace(result);
+
+                        LineWriter.LocalVariable(result, null, "packetBody", "PeekPacketBody(dataStream, packetHeader)");
+                        LineWriter.Line(result, "ParseAndHandleBody(packetHeader, packetBody);");
+                        LineWriter.LineSpace(result);
+
+                        LineWriter.Return(result, "SCPacketHeader.HEADER_SIZE + packetHeader.BodySize");
+                    }
+
+                    using (var m = BlockWriter.Method(result, AccessModifier.Private, MethodModifier.Empty, BaseTypes.VOID, "ParseAndHandleBody", 
+                        $"{packetHeader} header",
+                        "ArraySegment<byte> body"))
+                    {
+                        using (var s = BlockWriter.Switch(result, "header.Protocol"))
+                        {
+                            foreach(var p in protocolContents)
+                            {
+                                LineWriter.Case_Break(result, $"{packetProtocol}.{direction}_{p.ProtocolName}", $"ParseAndHandle_{direction}_{p.ProtocolName};");
+                            }
+                        }
+                    }
+
+                    LineWriter.Line(result, "#region Packet Paser Method");
+                    LineWriter.LineSpace(result);
+
+                    using (var methodBlock = BlockWriter.Block(result, $"private static {packetHeader} ParseHeader(ArraySegment<byte> dataStream)"))
+                    {
+                        LineWriter.Line(result, "Debug.Assert(dataStream.Array != null);");
+                        LineWriter.Line(result, "Debug.Assert(HasPacketHeader(dataStream));");
+                        LineWriter.LineSpace(result);
+
+                        LineWriter.Line(result, "int number = BitConverter.ToInt32(dataStream.Array, dataStream.Offset);");
+                        LineWriter.Line(result, $"var protocol = {packetProtocol}.Invalid;");
+
+                        using (var tryBlock = BlockWriter.Block(result, $"try"))
+                        {
+                            LineWriter.Line(result, $"protocol = ({packetProtocol})number;");
+                        }
+                        using (var catchBlock = BlockWriter.Block(result, $"catch (InvalidCastException)"))
+                        {
+                            LineWriter.Line(result, $"throw;");
+                        }
+                        LineWriter.LineSpace(result);
+
+                        LineWriter.Line(result, $"int bodySize = BitConverter.ToInt32(dataStream.Array, dataStream.Offset + sizeof(int));");
+                        using (var ifBlock = BlockWriter.Block(result, $"if (bodySize < 0)"))
+                        {
+                            LineWriter.Line(result, $"throw new ArgumentOutOfRangeException($\"패킷 BodySize가 음수입니다.핵유저로 의심되네요.ProtocolNumber[{{number}}] BodySize[{{bodySize}}]\");");
+                        }
+                        LineWriter.LineSpace(result);
+
+                        LineWriter.Line(result, $"return new {packetHeader}(protocol, bodySize);");
+                    }
+                    using (var methodBlock = BlockWriter.Block(result, "private static bool HasPacketHeader(ArraySegment<byte> dataStream)"))
+                    {
+                        LineWriter.Line(result, $"return (dataStream.Count >= {packetProtocol}.HEADER_SIZE);");
+                    }
+                    using (var methodBlock = BlockWriter.Block(result, $"private static bool HasPacketBody(ArraySegment<byte> dataStream, {packetHeader} packetHeader)"))
+                    {
+                        LineWriter.Line(result, $"return (dataStream.Count >= ({packetHeader}.HEADER_SIZE + packetHeader.BodySize));");
+                    }
+                    using (var methodBlock = BlockWriter.Block(result, $"private static ArraySegment<byte> PeekPacketBody(ArraySegment<byte> dataStream, {packetHeader} packetHeader)"))
+                    {
+                        LineWriter.Line(result, $"return new ArraySegment<byte>(dataStream.Array, dataStream.Offset + {packetHeader}.HEADER_SIZE, packetHeader.BodySize);");
+                    }
+                    LineWriter.LineSpace(result);
+
+                    LineWriter.Line(result, "#endregion");
+                    LineWriter.LineSpace(result);
+
+                    LineWriter.Line(result, "#region Packet handler Method");
+                    LineWriter.LineSpace(result);
+
+                    foreach (var p in protocolContents)
+                    {
+                        using (var methodBlock = BlockWriter.Block(result, $"private void ParseAndHandle_{direction}_{p.ProtocolName}(ArraySegment<byte> body)"))
+                        {
+                            using (var usingBlock = BlockWriter.Block(result, $"using (var reader = new BinaryDecoder(body))"))
+                            {
+                                foreach (var param in p.Parameters)
+                                {
+                                    LineWriter.Line(result, $"reader.Read(out {param.TypeName} {param.ParameterName});");
+                                }
+                                LineWriter.LineSpace(result);
+
+                                using (var lambdaBlock = BlockWriter.Block(result, $"RunOrReserveHandler(handler: async () =>"))
+                                {
+                                    LineWriter.Line(result, $"m_PacketHandler.HANDLE_{direction}_{p.ProtocolName}({ProtocolParameter.Concat(p.Parameters)});");
+                                }
+                                LineWriter.AppendPreviousLine(result, ");");
+                            }
+                        }
+                    }
+                    LineWriter.LineSpace(result);
+
+                    LineWriter.Line(result, "#endregion");
+                }
+            }
+            return result;
         }
     }
 }

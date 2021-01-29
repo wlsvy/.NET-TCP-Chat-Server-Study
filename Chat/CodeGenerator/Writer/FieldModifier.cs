@@ -19,7 +19,7 @@ namespace CodeGenerator.Writer
     {
         public static string String(this FieldModifier fieldModifier) => fieldModifier switch
         {
-            FieldModifier.Empty => " ",
+            FieldModifier.Empty => string.Empty,
             FieldModifier.Readonly => "readonly ",
             FieldModifier.Static => "static ",
             FieldModifier.Const => "const ",

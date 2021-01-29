@@ -23,9 +23,14 @@ namespace CodeGenerator.Writer
 
         #region STATIC METHOD
 
+        public static BlockWriter Block(CodeGenContext context, string line)
+        {
+            context.AppendLine(line);
+            return new BlockWriter(context);
+        }
+
         public static BlockWriter Enum(CodeGenContext context, AccessModifier accessModifier, string name, string type = null)
         {
-            _ = name ?? throw new ArgumentNullException(nameof(name));
             type = string.IsNullOrEmpty(type) ? string.Empty : $": {type}";
 
             context.AppendLine($"{accessModifier.String()}enum {name} {type}");
@@ -34,8 +39,6 @@ namespace CodeGenerator.Writer
 
         public static BlockWriter Class(CodeGenContext context, AccessModifier accessModifier, ClassModifier classModifier, string name, params string[] bases)
         {
-            _ = name ?? throw new ArgumentNullException(nameof(name));
-
             string declarationStr = $"{accessModifier.String()}{classModifier.String()}class {name}";
 
             if (bases.Length > 0)
@@ -59,8 +62,6 @@ namespace CodeGenerator.Writer
 
         public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name, string baseInit, params ProtocolParameter[] parameters)
         {
-            _ = name ?? throw new ArgumentNullException(nameof(name));
-
             if (string.IsNullOrEmpty(baseInit))
             {
                 context.AppendLine($"{accessModifier.String()}{name}({ProtocolParameter.Concat(parameters)})");
@@ -74,8 +75,12 @@ namespace CodeGenerator.Writer
 
         public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, MethodModifier methodModifier, string ret, string name, params ProtocolParameter[] parameters)
         {
-            _ = name ?? throw new ArgumentNullException(nameof(name));
+            context.AppendLine($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({ProtocolParameter.Concat(parameters)})");
+            return new BlockWriter(context);
+        }
 
+        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, MethodModifier methodModifier, string ret, string name, params string[] parameters)
+        {
             context.AppendLine($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({ProtocolParameter.Concat(parameters)})");
             return new BlockWriter(context);
         }

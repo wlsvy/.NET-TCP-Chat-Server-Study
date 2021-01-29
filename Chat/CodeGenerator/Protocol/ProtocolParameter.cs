@@ -40,5 +40,19 @@ namespace CodeGenerator.Protocol
             }
             return builder.ToString();
         }
+
+        public static string Concat(string[] parameters)
+        {
+            var builder = new StringBuilder();
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(", ");
+                }
+                builder.Append(parameters[i]);
+            }
+            return builder.ToString();
+        }
     }
 }

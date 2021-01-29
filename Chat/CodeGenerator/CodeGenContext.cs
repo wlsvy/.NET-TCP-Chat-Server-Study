@@ -10,6 +10,7 @@ namespace CodeGenerator
 
         private readonly StringBuilder m_StringBuilder = new StringBuilder();
         private uint m_Tap = 0;
+        public int Length => m_StringBuilder.Length;
 
         public CodeGenContext(string directoryPath, string fileName)
         {
@@ -34,6 +35,11 @@ namespace CodeGenerator
                 m_StringBuilder.Append("    ");
             }
             m_StringBuilder.AppendLine(line);
+        }
+
+        public void Insert(int index, string value)
+        {
+            m_StringBuilder.Insert(index, value);
         }
 
         public override string ToString()

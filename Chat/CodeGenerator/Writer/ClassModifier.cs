@@ -14,7 +14,7 @@ namespace CodeGenerator.Writer
     {
         public static string String(this ClassModifier classModifier) => classModifier switch
         {
-            ClassModifier.Empty => " ",
+            ClassModifier.Empty => string.Empty,
             ClassModifier.Abstract => "abstract ",
             ClassModifier.Sealed => "sealed ",
             ClassModifier.Static => "static ",

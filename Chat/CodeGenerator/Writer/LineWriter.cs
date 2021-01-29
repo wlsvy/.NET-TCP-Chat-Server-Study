@@ -16,14 +16,19 @@ namespace CodeGenerator.Writer
             context.AppendLine(line);
         }
 
-        public static void UsingNamespace(CodeGenContext context, string nameSpace)
-        {
-            context.AppendLine($"using {nameSpace};");
-        }
-
         public static void LineSpace(CodeGenContext context)
         {
             context.AppendLine(string.Empty);
+        }
+
+        public static void AppendPreviousLine(CodeGenContext context, string line)
+        {
+            context.Insert(context.Length - 2, line);
+        }
+
+        public static void UsingNamespace(CodeGenContext context, string nameSpace)
+        {
+            context.AppendLine($"using {nameSpace};");
         }
 
         public static void InterfaceMethod(CodeGenContext context, string returnType, string name, params ProtocolParameter[] parameters)
@@ -37,6 +42,45 @@ namespace CodeGenerator.Writer
                 ? $" = {defaultValue}"
                 : string.Empty;
             context.AppendLine($"{accessModifier.String()}{fieldModifier.String()}{typename} {name}{defaultValue};");
+        }
+
+        public static void LocalVariable(CodeGenContext context, string typename, string name, string value = null)
+        {
+            typename = string.IsNullOrEmpty(typename)
+                ? $"{BaseTypes.VAR}"
+                : typename;
+            value = string.IsNullOrEmpty(value)
+                ? string.Empty
+                : $" = {value}";
+
+            context.AppendLine($"{typename} {name}{value};");
+        }
+
+        public static void Return(CodeGenContext context, string value = null)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                context.AppendLine("return;");
+            }
+            else
+            {
+                context.AppendLine($"return {value};");
+            }
+        }
+
+        public static void Break(CodeGenContext context)
+        {
+            context.AppendLine("break;");
+        }
+
+        public static void Case_Break(CodeGenContext context, string comparand, string line)
+        {
+            context.AppendLine($"case {comparand}: {line} break;");
+        }
+
+        public static void Case_Return(CodeGenContext context, string comparand, string line)
+        {
+            context.AppendLine($"case {comparand}: {line} return;");
         }
     }
 }
