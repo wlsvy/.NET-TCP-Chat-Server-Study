@@ -33,40 +33,6 @@ namespace CodeGenerator.Helper
             };
         }
 
-        private static DirectoryInfo FindRootDirectory()
-        {
-            var directory = Directory.GetParent(Directory.GetCurrentDirectory());
-            while (directory != null &&
-                directory.Name != ROOT_DIRECTORY_NAME)
-            {
-                directory = directory.Parent;
-            }
-
-            if (directory == null ||
-                directory.Name != ROOT_DIRECTORY_NAME)
-            {
-                return null;
-            }
-
-            return directory;
-        }
-
-        public static ProtocolContent.ProtocolDirection GetDirection(string direction)
-        {
-            if (direction == ProtocolContent.ProtocolDirection.CS.ToString())
-            {
-                return ProtocolContent.ProtocolDirection.CS;
-            }
-            else if (direction == ProtocolContent.ProtocolDirection.SC.ToString())
-            {
-                return ProtocolContent.ProtocolDirection.SC;
-            }
-            else
-            {
-                throw new ArgumentException(direction);
-            }
-        }
-
         public static string GetNamespaceFromDirectory(string directoryPath)
         {
             var pos = directoryPath.LastIndexOf(ROOT_DIRECTORY_NAME);
@@ -83,6 +49,24 @@ namespace CodeGenerator.Helper
             }
 
             return directoryPath.Substring(pos).Replace("\\", ".");
+        }
+
+        private static DirectoryInfo FindRootDirectory()
+        {
+            var directory = Directory.GetParent(Directory.GetCurrentDirectory());
+            while (directory != null &&
+                directory.Name != ROOT_DIRECTORY_NAME)
+            {
+                directory = directory.Parent;
+            }
+
+            if (directory == null ||
+                directory.Name != ROOT_DIRECTORY_NAME)
+            {
+                return null;
+            }
+
+            return directory;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace CodeGenerator.Protocol
+﻿using System;
+
+namespace CodeGenerator.Protocol
 {
     internal readonly struct ProtocolContent
     {
@@ -21,11 +23,16 @@
         }
 
         public readonly string ProtocolName;
-        public readonly ProtocolDirection Direction;
+        public readonly string Direction;
         public readonly CodeGenParam[] Parameters;
 
-        public ProtocolContent(string name, ProtocolDirection direction, params CodeGenParam[] parameters)
+        public ProtocolContent(string name, string direction, params CodeGenParam[] parameters)
         {
+            if(!Enum.TryParse<ProtocolDirection>(direction, out _))
+            {
+                throw new ArgumentException(nameof(direction));
+            }
+
             ProtocolName = name;
             Direction = direction;
             Parameters = parameters;

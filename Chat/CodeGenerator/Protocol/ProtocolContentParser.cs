@@ -47,8 +47,7 @@ namespace CodeGenerator.Protocol
             foreach (var protocol in protocols.Elements())
             {
                 var protocolName = protocol.Attribute(ProtocolContent.ProtocolAttribute.name.ToString()).Value;
-                var directionValue = protocol.Attribute(ProtocolContent.ProtocolAttribute.direction.ToString()).Value;
-                var direction = CodeGenUtil.GetDirection(directionValue);
+                var direction = protocol.Attribute(ProtocolContent.ProtocolAttribute.direction.ToString()).Value;
                 var paramList = new List<CodeGenParam>();
                 foreach (var param in protocol.Elements())
                 {

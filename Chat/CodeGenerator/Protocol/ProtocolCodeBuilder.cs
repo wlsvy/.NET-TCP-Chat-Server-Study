@@ -26,7 +26,7 @@ namespace CodeGenerator.Protocol
             return result;
         }
 
-        private static CodeGenContext BuildPacketProtocolEnum(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        private static CodeGenContext BuildPacketProtocolEnum(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
             var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
@@ -51,7 +51,7 @@ namespace CodeGenerator.Protocol
             return code;
         }
 
-        private static CodeGenContext BuildPacketHandlerInterface(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        private static CodeGenContext BuildPacketHandlerInterface(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
             var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
@@ -66,14 +66,14 @@ namespace CodeGenerator.Protocol
                 {
                     foreach (var p in protocolContents)
                     {
-                        code.Line($"void HANDLE_{direction}_{p.ProtocolName}({CodeGenParam.Concat(p.Parameters)});");
+                        code.Line($"void HANDLE_{direction}_{p.ProtocolName}({p.Parameters.Concat()});");
                     }
                 }
             }
             return code;
         }
 
-        private static CodeGenContext BuildPacketPacker(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        private static CodeGenContext BuildPacketPacker(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
             var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
@@ -132,7 +132,7 @@ namespace CodeGenerator.Protocol
             return code;
         }
 
-        private static CodeGenContext BuildPacketProcessor(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        private static CodeGenContext BuildPacketProcessor(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
             var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
@@ -259,7 +259,7 @@ namespace CodeGenerator.Protocol
 
                                 using (code.Scope($"RunOrReserveHandler(handler: async () =>"))
                                 {
-                                    code.Line($"m_PacketHandler.HANDLE_{direction}_{p.ProtocolName}({CodeGenParam.ConcatNames(p.Parameters)});");
+                                    code.Line($"m_PacketHandler.HANDLE_{direction}_{p.ProtocolName}({p.Parameters.ConcatName()});");
                                 }
                                 code.Line(");");
                             }
@@ -273,7 +273,7 @@ namespace CodeGenerator.Protocol
             return code;
         }
 
-        private static CodeGenContext BuildPacketSender(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        private static CodeGenContext BuildPacketSender(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
             var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
@@ -301,9 +301,9 @@ namespace CodeGenerator.Protocol
 
                     foreach (var p in protocolContents)
                     {
-                        using (code.Scope($"public void SEND_{direction}_{p.ProtocolName}({CodeGenParam.Concat(p.Parameters)})"))
+                        using (code.Scope($"public void SEND_{direction}_{p.ProtocolName}({p.Parameters.Concat()})"))
                         {
-                            code.Line($"var packet = {packetPacker}.Pack_{direction}_{p.ProtocolName}({CodeGenParam.ConcatNames(p.Parameters)});");
+                            code.Line($"var packet = {packetPacker}.Pack_{direction}_{p.ProtocolName}({p.Parameters.ConcatName()});");
                             code.Line($"m_Connection.Send(packet);");
                         }
                         code.LineSpace();
