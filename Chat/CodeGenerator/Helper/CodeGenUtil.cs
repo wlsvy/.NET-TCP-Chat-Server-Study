@@ -10,7 +10,8 @@ namespace CodeGenerator.Helper
         public enum Directories : byte
         {
             Root,
-            Shared_Protocol
+            Shared,
+            Shared_Protocol,
         }
 
         public const string ROOT_DIRECTORY_NAME = "Chat";
@@ -27,6 +28,7 @@ namespace CodeGenerator.Helper
             s_DirectoryDic = new Dictionary<Directories, string>()
             {
                 { Directories.Root, ROOT_DIRECTORY_PATH },
+                { Directories.Shared, Path.Combine(ROOT_DIRECTORY_PATH, "Shared") },
                 { Directories.Shared_Protocol, Path.Combine(ROOT_DIRECTORY_PATH, "Shared", "Protocol") },
             };
         }

@@ -42,16 +42,6 @@ namespace CodeGenerator
             LineSpace();
         }
 
-        public void Tap() => m_Tap++;
-        public void UnTap()
-        {
-            if(m_Tap <= 0)
-            {
-                throw new InvalidOperationException("더 이상 Untap을 할 수 없음");
-            }
-            m_Tap--;
-        }
-
         public void Line(string line)
         {
             for(int i = 0; i < m_Tap; i++)
@@ -66,11 +56,6 @@ namespace CodeGenerator
             m_StringBuilder.AppendLine();
         }
 
-        public void Insert(int index, string value)
-        {
-            m_StringBuilder.Insert(index, value);
-        }
-
         public CodeScope Scope(string line)
         {
             Line(line);
@@ -80,6 +65,16 @@ namespace CodeGenerator
         public override string ToString()
         {
             return m_StringBuilder.ToString();
+        }
+
+        private void Tap() => m_Tap++;
+        private void UnTap()
+        {
+            if (m_Tap <= 0)
+            {
+                throw new InvalidOperationException("더 이상 Untap을 할 수 없음");
+            }
+            m_Tap--;
         }
     }
 }

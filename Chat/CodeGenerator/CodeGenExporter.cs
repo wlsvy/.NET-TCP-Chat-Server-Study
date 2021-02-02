@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using CodeGenerator.Helper;
 
 namespace CodeGenerator
 {
@@ -17,6 +18,8 @@ namespace CodeGenerator
                 }
             }
 
+            ClearPreviousCodeGenFile();
+
             var tasks = new List<Task>(contexts.Count);
             foreach(var context in contexts)
             {
@@ -28,7 +31,18 @@ namespace CodeGenerator
             Task.WaitAll(tasks.ToArray());
         }
 
-        public static void Export(CodeGenContext context)
+        private static void ClearPreviousCodeGenFile()
+        {
+            var sharedDirectory = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared];
+            var files = Directory.GetFiles(sharedDirectory, "*.g.cs", SearchOption.AllDirectories);
+
+            foreach(var f in files)
+            {
+                File.Delete(f);
+            }
+        }
+
+        private static void Export(CodeGenContext context)
         {
             var path = Path.Combine(context.DirectoryPath, context.FileName);
             using(var writer = new StreamWriter(path, false, Encoding.UTF8))
