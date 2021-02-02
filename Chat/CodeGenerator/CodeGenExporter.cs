@@ -33,7 +33,7 @@ namespace CodeGenerator
 
         private static void ClearPreviousCodeGenFile()
         {
-            var sharedDirectory = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared];
+            var sharedDirectory = CodeGenUtil.SHARED_DIR_PATH;
             var files = Directory.GetFiles(sharedDirectory, "*.g.cs", SearchOption.AllDirectories);
 
             foreach(var f in files)

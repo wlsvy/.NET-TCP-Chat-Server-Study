@@ -7,30 +7,21 @@ namespace CodeGenerator.Helper
 {
     internal static class CodeGenUtil
     {
-        public enum Directories : byte
-        {
-            Root,
-            Shared,
-            Shared_Protocol,
-        }
-
         public const string ROOT_DIRECTORY_NAME = "Chat";
 
-        private static DirectoryInfo s_RootDirectoryPath;
-        public static string ROOT_DIRECTORY_PATH => s_RootDirectoryPath.FullName;
-
-        public static Dictionary<Directories, string> s_DirectoryDic;
-        public static IReadOnlyDictionary<Directories, string> DIRECTORY_DIC => s_DirectoryDic;
+        private static string s_RootDirPath;
+        private static string s_SharedDirPath;
+        private static string s_SharedProtocolDirPath;
+        public static string ROOT_DIR_PATH => s_RootDirPath;
+        public static string SHARED_DIR_PATH => s_SharedDirPath;
+        public static string SHARED_PROTOCOL_DIR_PATH => s_SharedProtocolDirPath;
 
         public static void Initialize()
         {
-            s_RootDirectoryPath = FindRootDirectory() ?? throw new DirectoryNotFoundException("루트 디렉토리를 찾지 못했습니다");
-            s_DirectoryDic = new Dictionary<Directories, string>()
-            {
-                { Directories.Root, ROOT_DIRECTORY_PATH },
-                { Directories.Shared, Path.Combine(ROOT_DIRECTORY_PATH, "Shared") },
-                { Directories.Shared_Protocol, Path.Combine(ROOT_DIRECTORY_PATH, "Shared", "Protocol") },
-            };
+            var root = FindRootDirectory() ?? throw new DirectoryNotFoundException("루트 디렉토리를 찾지 못했습니다");
+            s_RootDirPath = root.FullName;
+            s_SharedDirPath = $"{root.FullName}\\Shared";
+            s_SharedProtocolDirPath = $"{root.FullName}\\Shared\\Protocol";
         }
 
         public static string GetNamespaceFromDirectory(string directoryPath)

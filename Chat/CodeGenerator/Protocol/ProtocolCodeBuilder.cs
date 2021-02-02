@@ -28,7 +28,7 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketProtocolEnum(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
-            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.SHARED_PROTOCOL_DIR_PATH;
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
 
             var packetProtocolEnum = $"{direction}PacketProtocol";
@@ -53,7 +53,7 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketHandlerInterface(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
-            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.SHARED_PROTOCOL_DIR_PATH;
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
 
             var packetHandlerInterface = $"I{direction}PacketHandler";
@@ -75,7 +75,7 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketPacker(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
-            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.SHARED_PROTOCOL_DIR_PATH;
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
 
             var packetPacker = $"{direction}PacketPacker";
@@ -134,7 +134,7 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketProcessor(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
-            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.SHARED_PROTOCOL_DIR_PATH;
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
 
             var packetProcessor = $"{direction}PacketProcessor";
@@ -275,7 +275,7 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketSender(IEnumerable<ProtocolContent> protocolContents, string direction)
         {
-            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.SHARED_PROTOCOL_DIR_PATH;
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
 
             var packetSender = $"{direction}PacketSender";
