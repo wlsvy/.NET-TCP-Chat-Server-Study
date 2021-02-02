@@ -23,7 +23,7 @@ namespace CodeGenerator.Helper
 
         public static string GetNamespaceFromDirectory(string directoryPath)
         {
-            var pos = directoryPath.IndexOf(Global.ROOT_DIRECTORY_NAME);
+            var pos = directoryPath.LastIndexOf(Global.ROOT_DIRECTORY_NAME);
             if(pos == -1)
             {
                 return null;

@@ -9,7 +9,7 @@
 using Shared.Network;
 using System;
 
-namespace roject.Chat.Shared.Protocol
+namespace Shared.Protocol
 {
     public sealed class SCPacketSender
     {

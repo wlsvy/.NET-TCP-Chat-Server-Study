@@ -31,9 +31,9 @@ namespace CodeGenerator.Writer
             context.Line($"using {nameSpace};");
         }
 
-        public static void InterfaceMethod(CodeGenContext context, string returnType, string name, params ProtocolParameter[] parameters)
+        public static void InterfaceMethod(CodeGenContext context, string returnType, string name, params CodeGenParam[] parameters)
         {
-            context.Line($"{returnType} {name}({ProtocolParameter.Concat(parameters)});");
+            context.Line($"{returnType} {name}({CodeGenParam.Concat(parameters)});");
         }
 
         public static void Field(CodeGenContext context, AccessModifier accessModifier, FieldModifier fieldModifier, string typename, string name, string defaultValue = null)

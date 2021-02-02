@@ -60,28 +60,28 @@ namespace CodeGenerator.Writer
             return new BlockWriter(context);
         }
 
-        public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name, string baseInit, params ProtocolParameter[] parameters)
+        public static BlockWriter Constructor(CodeGenContext context, AccessModifier accessModifier, string name, string baseInit, params CodeGenParam[] parameters)
         {
             if (string.IsNullOrEmpty(baseInit))
             {
-                context.Line($"{accessModifier.String()}{name}({ProtocolParameter.Concat(parameters)})");
+                context.Line($"{accessModifier.String()}{name}({CodeGenParam.Concat(parameters)})");
             }
             else
             {
-                context.Line($"{accessModifier.String()}{name}({ProtocolParameter.Concat(parameters)}) : {baseInit}");
+                context.Line($"{accessModifier.String()}{name}({CodeGenParam.Concat(parameters)}) : {baseInit}");
             }
             return new BlockWriter(context);
         }
 
-        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, MethodModifier methodModifier, string ret, string name, params ProtocolParameter[] parameters)
+        public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, MethodModifier methodModifier, string ret, string name, params CodeGenParam[] parameters)
         {
-            context.Line($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({ProtocolParameter.Concat(parameters)})");
+            context.Line($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({CodeGenParam.Concat(parameters)})");
             return new BlockWriter(context);
         }
 
         public static BlockWriter Method(CodeGenContext context, AccessModifier accessModifier, MethodModifier methodModifier, string ret, string name, params string[] parameters)
         {
-            context.Line($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({ProtocolParameter.Concat(parameters)})");
+            context.Line($"{accessModifier.String()}{methodModifier.String()}{ret} {name}({CodeGenParam.Concat(parameters)})");
             return new BlockWriter(context);
         }
 

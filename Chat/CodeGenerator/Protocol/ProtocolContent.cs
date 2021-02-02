@@ -22,9 +22,9 @@
 
         public readonly string ProtocolName;
         public readonly ProtocolDirection Direction;
-        public readonly ProtocolParameter[] Parameters;
+        public readonly CodeGenParam[] Parameters;
 
-        public ProtocolContent(string name, ProtocolDirection direction, params ProtocolParameter[] parameters)
+        public ProtocolContent(string name, ProtocolDirection direction, params CodeGenParam[] parameters)
         {
             ProtocolName = name;
             Direction = direction;

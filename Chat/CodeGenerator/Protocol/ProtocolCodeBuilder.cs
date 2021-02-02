@@ -40,7 +40,7 @@ namespace CodeGenerator.Protocol
                 using (code.Scope($"public enum {newTypename}: int"))
                 {
                     code.Line($"Invalid,");
-                    code.LineSpcae();
+                    code.LineSpace();
 
                     foreach (var p in protocolContents)
                     {
@@ -65,7 +65,7 @@ namespace CodeGenerator.Protocol
                 {
                     foreach (var p in protocolContents)
                     {
-                        code.Line($"void HANDLE_{direction}_{p.ProtocolName}({ProtocolParameter.Concat(p.Parameters)});");
+                        code.Line($"void HANDLE_{direction}_{p.ProtocolName}({CodeGenParam.Concat(p.Parameters)});");
                     }
                 }
             }
@@ -78,63 +78,56 @@ namespace CodeGenerator.Protocol
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
             var newTypename = $"{direction}PacketPacker";
             var protocolEnumType = $"{direction}PacketProtocol";
-            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
 
-            LineWriter.CodeGenCaption(result);
-            LineWriter.LineSpace(result);
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
 
-            LineWriter.UsingNamespace(result, "Shared.Network");
-            LineWriter.UsingNamespace(result, "Shared.Util");
-            LineWriter.UsingNamespace(result, "System");
-            LineWriter.LineSpace(result);
+            code.Line($"using Shared.Network;");
+            code.Line($"using Shared.Util;");
+            code.Line($"using System;");
+            code.LineSpace();
 
-            using (var n = BlockWriter.Namespace(result, directoryNamespace))
+            using (code.Scope($"namespace {directoryNamespace}"))
             {
-                using (var c = BlockWriter.Class(result, AccessModifier.Public, ClassModifier.Static, newTypename))
+                using (code.Scope($"public static class {newTypename}"))
                 {
-                    using (var m = BlockWriter.Method(result, AccessModifier.Private, MethodModifier.Static, BaseTypes.VOID, "WriteHeader",
-                        new ProtocolParameter("BinaryEncoder", "encoder"),
-                        new ProtocolParameter(protocolEnumType, "protocol"),
-                        new ProtocolParameter(BaseTypes.INT, "bodySize")))
+                    using(code.Scope($"private static void WriteHeader(BinaryEncoder encoder, {protocolEnumType} protocol, int bodySize)"))
                     {
-                        LineWriter.Line(result, "encoder.Write(in protocol);");
-                        LineWriter.Line(result, "encoder.Write(in bodySize);");
+                        code.Line("encoder.Write(in protocol);");
+                        code.Line("encoder.Write(in bodySize);");
                     }
-
 
                     foreach (var p in protocolContents)
                     {
-                        using (var m = BlockWriter.Method(result, AccessModifier.Public, MethodModifier.Static, "ArraySegment<byte>", $"Pack_{direction}_{p.ProtocolName}", p.Parameters))
+                        using (code.Scope($"public static ArraySegment<byte> Pack_{direction}_{p.ProtocolName}({p.Parameters.Concat()})"))
                         {
-                            LineWriter.Line(result, $"var protocol = {protocolEnumType}.{direction}_{p.ProtocolName};");
+                            code.Line($"var protocol = {protocolEnumType}.{direction}_{p.ProtocolName};");
+                            code.LineSpace();
 
-                            LineWriter.LineSpace(result);
-
-                            LineWriter.Line(result, $"int bodySize = 0;");
+                            code.Line($"int bodySize = 0;");
                             foreach (var param in p.Parameters)
                             {
-                                LineWriter.Line(result, $"bodySize += {param.ParameterName}.SizeForWrite();");
+                                code.Line($"bodySize += {param.ParameterName}.SizeForWrite();");
                             }
-                            LineWriter.LineSpace(result);
+                            code.LineSpace();
 
-                            LineWriter.Line(result, $"int packetSize = {direction}PacketHeader.HEADER_SIZE + bodySize;");
-                            LineWriter.LineSpace(result);
+                            code.Line($"int packetSize = {direction}PacketHeader.HEADER_SIZE + bodySize;");
+                            code.LineSpace();
 
-                            LineWriter.Line(result, $"var packetBuffer = new ArraySegment<byte>(new byte[packetSize]);");
-                            using (var u = BlockWriter.Using(result, "encoder", "BinaryEncoder", "packetBuffer"))
+                            code.Line($"var packetBuffer = new ArraySegment<byte>(new byte[packetSize]);");
+                            using (code.Scope($"using(var encoder = new BinaryEncoder(packetBuffer))"))
                             {
-                                LineWriter.Line(result, $"WriteHeader(encoder, protocol, bodySize);");
+                                code.Line($"WriteHeader(encoder, protocol, bodySize);");
                                 foreach (var param in p.Parameters)
                                 {
-                                    LineWriter.Line(result, $"encoder.Write(in {param.ParameterName});");
+                                    code.Line($"encoder.Write(in {param.ParameterName});");
                                 }
                             }
-                            LineWriter.Line(result, $"return packetBuffer;");
+                            code.Line($"return packetBuffer;");
                         }
                     }
                 }
             }
-            return result;
+            return code;
         }
 
         private static CodeGenContext BuildPacketProcessor(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
@@ -147,138 +140,136 @@ namespace CodeGenerator.Protocol
             var packetHeader = $"{direction}PacketHeader";
             var packetProtocol = $"{direction}PacketProtocol";
 
-            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
 
-            LineWriter.CodeGenCaption(result);
-            LineWriter.LineSpace(result);
+            code.Line($"using Shared.Network;");
+            code.Line($"using System;");
+            code.Line($"using System.Diagnostics;");
+            code.LineSpace();
 
-            LineWriter.UsingNamespace(result, "Shared.Network");
-            LineWriter.UsingNamespace(result, "System");
-            LineWriter.UsingNamespace(result, "System.Diagnostics");
-            LineWriter.LineSpace(result);
 
-            using (var namespaceBlock = BlockWriter.Namespace(result, directoryNamespace))
+            using (code.Scope($"namespace {directoryNamespace}"))
             {
-                using (var classBlock = BlockWriter.Block(result, $"public sealed class {newTypename} : PacketProcessorBase"))
+            using (code.Scope($"public sealed class {newTypename} : PacketProcessorBase"))
                 {
-                    LineWriter.Line(result, $"private readonly {packetHandlerInterface} m_PacketHandler;");
-                    LineWriter.LineSpace(result);
+                    code.Line($"private readonly {packetHandlerInterface} m_PacketHandler;");
+                    code.LineSpace();
 
-                    using (var constructor = BlockWriter.Block(result, $"public {newTypename}({packetHandlerInterface} handler)"))
+                    using (code.Scope($"public {newTypename}({packetHandlerInterface} handler)"))
                     {
-                        LineWriter.Line(result, "m_PacketHandler = handler ?? throw new ArgumentNullException(nameof(handler));");
+                        code.Line("m_PacketHandler = handler ?? throw new ArgumentNullException(nameof(handler));");
                     }
 
-                    using (var methodBlock = BlockWriter.Block(result, $"public int ParseAndHandlePacket(ArraySegment<byte> dataStream)"))
+                    using (code.Scope($"public int ParseAndHandlePacket(ArraySegment<byte> dataStream)"))
                     {
-                        using (var ifBlock = BlockWriter.Block(result, $"if(!HasPacketHeader(dataStream))"))
+                        using (code.Scope($"if(!HasPacketHeader(dataStream))"))
                         {
-                            LineWriter.Return(result, "0");
+                            code.Line($"return 0;");
                         }
-                        LineWriter.LineSpace(result);
+                        code.LineSpace();
 
-                        LineWriter.Line(result, "var packetHeader = ParseHeader(dataStream);");
-                        using (var ifBlock = BlockWriter.Block(result, $"if(!HasPacketBody(dataStream, packetHeader))"))
+                        code.Line("var packetHeader = ParseHeader(dataStream);");
+                        using (code.Scope($"if(!HasPacketBody(dataStream, packetHeader))"))
                         {
-                            LineWriter.Return(result, "0");
+                            code.Line($"return 0;");
                         }
-                        LineWriter.LineSpace(result);
+                        code.LineSpace();
 
-                        LineWriter.Line(result, "var packetBody = PeekPacketBody(dataStream, packetHeader);");
-                        LineWriter.Line(result, "ParseAndHandleBody(packetHeader, packetBody);");
-                        LineWriter.LineSpace(result);
+                        code.Line("var packetBody = PeekPacketBody(dataStream, packetHeader);");
+                        code.Line("ParseAndHandleBody(packetHeader, packetBody);");
+                        code.LineSpace();
 
-                        LineWriter.Return(result, $"{packetHeader}.HEADER_SIZE + packetHeader.BodySize");
+                        code.Line($"return {packetHeader}.HEADER_SIZE + packetHeader.BodySize;");
                     }
 
-                    using (var methodBlock = BlockWriter.Block(result, $"private void ParseAndHandleBody({packetHeader} header, ArraySegment<byte> body)"))
+                    using (code.Scope($"private void ParseAndHandleBody({packetHeader} header, ArraySegment<byte> body)"))
                     {
-                        using (var switchBlock = BlockWriter.Block(result, "switch (header.Protocol)"))
+                        using (code.Scope("switch (header.Protocol)"))
                         {
                             foreach (var p in protocolContents)
                             {
-                                LineWriter.Line(result, $"case {packetProtocol}.{direction}_{p.ProtocolName}: ParseAndHandle_{direction}_{p.ProtocolName}(body); break;");
+                                code.Line($"case {packetProtocol}.{direction}_{p.ProtocolName}: ParseAndHandle_{direction}_{p.ProtocolName}(body); break;");
                             }
                         }
                     }
 
-                    LineWriter.Line(result, "#region Packet Paser Method");
-                    LineWriter.LineSpace(result);
+                    code.Line("#region Packet Paser Method");
+                    code.LineSpace();
 
-                    using (var methodBlock = BlockWriter.Block(result, $"private static {packetHeader} ParseHeader(ArraySegment<byte> dataStream)"))
+                    using (code.Scope($"private static {packetHeader} ParseHeader(ArraySegment<byte> dataStream)"))
                     {
-                        LineWriter.Line(result, "Debug.Assert(dataStream.Array != null);");
-                        LineWriter.Line(result, "Debug.Assert(HasPacketHeader(dataStream));");
-                        LineWriter.LineSpace(result);
+                        code.Line("Debug.Assert(dataStream.Array != null);");
+                        code.Line("Debug.Assert(HasPacketHeader(dataStream));");
+                        code.LineSpace();
 
-                        LineWriter.Line(result, "int number = BitConverter.ToInt32(dataStream.Array, dataStream.Offset);");
-                        LineWriter.Line(result, $"var protocol = {packetProtocol}.Invalid;");
+                        code.Line("int number = BitConverter.ToInt32(dataStream.Array, dataStream.Offset);");
+                        code.Line($"var protocol = {packetProtocol}.Invalid;");
 
-                        using (var tryBlock = BlockWriter.Block(result, $"try"))
+                        using (code.Scope($"try"))
                         {
-                            LineWriter.Line(result, $"protocol = ({packetProtocol})number;");
+                            code.Line($"protocol = ({packetProtocol})number;");
                         }
-                        using (var catchBlock = BlockWriter.Block(result, $"catch (InvalidCastException)"))
+                        using (code.Scope($"catch (InvalidCastException)"))
                         {
-                            LineWriter.Line(result, $"throw;");
+                            code.Line($"throw;");
                         }
-                        LineWriter.LineSpace(result);
+                        code.LineSpace();
 
-                        LineWriter.Line(result, $"int bodySize = BitConverter.ToInt32(dataStream.Array, dataStream.Offset + sizeof(int));");
-                        using (var ifBlock = BlockWriter.Block(result, $"if (bodySize < 0)"))
+                        code.Line($"int bodySize = BitConverter.ToInt32(dataStream.Array, dataStream.Offset + sizeof(int));");
+                        using (code.Scope($"if (bodySize < 0)"))
                         {
-                            LineWriter.Line(result, $"throw new ArgumentOutOfRangeException($\"패킷 BodySize가 음수입니다. ProtocolNumber[{{number}}] BodySize[{{bodySize}}]\");");
+                            code.Line($"throw new ArgumentOutOfRangeException($\"패킷 BodySize가 음수입니다. ProtocolNumber[{{number}}] BodySize[{{bodySize}}]\");");
                         }
-                        LineWriter.LineSpace(result);
+                        code.LineSpace();
 
-                        LineWriter.Line(result, $"return new {packetHeader}(protocol, bodySize);");
+                        code.Line($"return new {packetHeader}(protocol, bodySize);");
                     }
-                    using (var methodBlock = BlockWriter.Block(result, "private static bool HasPacketHeader(ArraySegment<byte> dataStream)"))
+                    using (code.Scope("private static bool HasPacketHeader(ArraySegment<byte> dataStream)"))
                     {
-                        LineWriter.Line(result, $"return (dataStream.Count >= {packetHeader}.HEADER_SIZE);");
+                        code.Line($"return (dataStream.Count >= {packetHeader}.HEADER_SIZE);");
                     }
-                    using (var methodBlock = BlockWriter.Block(result, $"private static bool HasPacketBody(ArraySegment<byte> dataStream, {packetHeader} packetHeader)"))
+                    using (code.Scope($"private static bool HasPacketBody(ArraySegment<byte> dataStream, {packetHeader} packetHeader)"))
                     {
-                        LineWriter.Line(result, $"return (dataStream.Count >= ({packetHeader}.HEADER_SIZE + packetHeader.BodySize));");
+                        code.Line($"return (dataStream.Count >= ({packetHeader}.HEADER_SIZE + packetHeader.BodySize));");
                     }
-                    using (var methodBlock = BlockWriter.Block(result, $"private static ArraySegment<byte> PeekPacketBody(ArraySegment<byte> dataStream, {packetHeader} packetHeader)"))
+                    using (code.Scope($"private static ArraySegment<byte> PeekPacketBody(ArraySegment<byte> dataStream, {packetHeader} packetHeader)"))
                     {
-                        LineWriter.Line(result, $"return new ArraySegment<byte>(dataStream.Array, dataStream.Offset + {packetHeader}.HEADER_SIZE, packetHeader.BodySize);");
+                        code.Line($"return new ArraySegment<byte>(dataStream.Array, dataStream.Offset + {packetHeader}.HEADER_SIZE, packetHeader.BodySize);");
                     }
-                    LineWriter.LineSpace(result);
+                    code.LineSpace();
 
-                    LineWriter.Line(result, "#endregion");
-                    LineWriter.LineSpace(result);
+                    code.Line("#endregion");
+                    code.LineSpace();
 
-                    LineWriter.Line(result, "#region Packet handler Method");
-                    LineWriter.LineSpace(result);
+                    code.Line("#region Packet handler Method");
+                    code.LineSpace();
 
                     foreach (var p in protocolContents)
                     {
-                        using (var methodBlock = BlockWriter.Block(result, $"private void ParseAndHandle_{direction}_{p.ProtocolName}(ArraySegment<byte> body)"))
+                        using (code.Scope($"private void ParseAndHandle_{direction}_{p.ProtocolName}(ArraySegment<byte> body)"))
                         {
-                            using (var usingBlock = BlockWriter.Block(result, $"using (var reader = new BinaryDecoder(body))"))
+                            using (code.Scope($"using (var reader = new BinaryDecoder(body))"))
                             {
                                 foreach (var param in p.Parameters)
                                 {
-                                    LineWriter.Line(result, $"reader.Read(out {param.TypeName} {param.ParameterName});");
+                                    code.Line($"reader.Read(out {param.TypeName} {param.ParameterName});");
                                 }
-                                LineWriter.LineSpace(result);
+                                code.LineSpace();
 
-                                using (var lambdaBlock = BlockWriter.Block(result, $"RunOrReserveHandler(handler: async () =>"))
+                                using (var lambdaBlock = code.Scope($"RunOrReserveHandler(handler: async () =>"))
                                 {
-                                    LineWriter.Line(result, $"m_PacketHandler.HANDLE_{direction}_{p.ProtocolName}({ProtocolParameter.ConcatNames(p.Parameters)});");
+                                    code.Line($"m_PacketHandler.HANDLE_{direction}_{p.ProtocolName}({CodeGenParam.ConcatNames(p.Parameters)});");
                                 }
-                                LineWriter.AppendPreviousLine(result, ");");
+                                code.Line(");");
                             }
                         }
                     }
-                    LineWriter.LineSpace(result);
+                    code.LineSpace();
 
-                    LineWriter.Line(result, "#endregion");
+                    code.Line("#endregion");
                 }
             }
-            return result;
+            return code;
         }
 
         private static CodeGenContext BuildPacketSender(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
@@ -312,9 +303,9 @@ namespace CodeGenerator.Protocol
 
                     foreach (var p in protocolContents)
                     {
-                        using (var methodBlock = BlockWriter.Block(result, $"public void SEND_{direction}_{p.ProtocolName}({ProtocolParameter.Concat(p.Parameters)})"))
+                        using (var methodBlock = BlockWriter.Block(result, $"public void SEND_{direction}_{p.ProtocolName}({CodeGenParam.Concat(p.Parameters)})"))
                         {
-                            LineWriter.Line(result, $"var packet = {packetPacker}.Pack_{direction}_{p.ProtocolName}({ProtocolParameter.ConcatNames(p.Parameters)});");
+                            LineWriter.Line(result, $"var packet = {packetPacker}.Pack_{direction}_{p.ProtocolName}({CodeGenParam.ConcatNames(p.Parameters)});");
                             LineWriter.Line(result, $"m_Connection.Send(packet);");
                         }
                         LineWriter.LineSpace(result);
