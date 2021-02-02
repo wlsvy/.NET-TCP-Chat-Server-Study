@@ -33,7 +33,7 @@ namespace CodeGenerator.Protocol
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
             var newTypename = $"{direction}PacketProtocol";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
 
             using (code.Scope($"namespace {directoryNamespace}"))
             {
@@ -57,7 +57,7 @@ namespace CodeGenerator.Protocol
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
             var newTypename = $"I{direction}PacketHandler";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
 
             using (code.Scope($"namespace {directoryNamespace}"))
             {
@@ -79,7 +79,7 @@ namespace CodeGenerator.Protocol
             var newTypename = $"{direction}PacketPacker";
             var protocolEnumType = $"{direction}PacketProtocol";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
 
             code.Line($"using Shared.Network;");
             code.Line($"using Shared.Util;");
@@ -140,13 +140,12 @@ namespace CodeGenerator.Protocol
             var packetHeader = $"{direction}PacketHeader";
             var packetProtocol = $"{direction}PacketProtocol";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
 
             code.Line($"using Shared.Network;");
             code.Line($"using System;");
             code.Line($"using System.Diagnostics;");
             code.LineSpace();
-
 
             using (code.Scope($"namespace {directoryNamespace}"))
             {
@@ -256,7 +255,7 @@ namespace CodeGenerator.Protocol
                                 }
                                 code.LineSpace();
 
-                                using (var lambdaBlock = code.Scope($"RunOrReserveHandler(handler: async () =>"))
+                                using (code.Scope($"RunOrReserveHandler(handler: async () =>"))
                                 {
                                     code.Line($"m_PacketHandler.HANDLE_{direction}_{p.ProtocolName}({CodeGenParam.ConcatNames(p.Parameters)});");
                                 }
@@ -280,40 +279,36 @@ namespace CodeGenerator.Protocol
             var newTypename = $"{direction}PacketSender";
             var packetPacker = $"{direction}PacketPacker";
 
-            var result = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
 
-            LineWriter.CodeGenCaption(result);
-            LineWriter.LineSpace(result);
+            code.Line("using Shared.Network;");
+            code.Line("using System;");
+            code.LineSpace();
 
-            LineWriter.Line(result, "using Shared.Network;");
-            LineWriter.Line(result, "using System;");
-            LineWriter.LineSpace(result);
-
-            using (var namespaceBlock = BlockWriter.Block(result, $"namespace {directoryNamespace}"))
+            using (code.Scope($"namespace {directoryNamespace}"))
             {
-                using (var classBlock = BlockWriter.Block(result, $"public sealed class {newTypename}"))
+                using (code.Scope($"public sealed class {newTypename}"))
                 {
-                    LineWriter.Line(result, "private AsyncTcpConnection m_Connection;");
+                    code.Line("private AsyncTcpConnection m_Connection;");
 
-                    using (var ctorBlock = BlockWriter.Block(result, $"public {newTypename}(AsyncTcpConnection connection)"))
+                    using (code.Scope($"public {newTypename}(AsyncTcpConnection connection)"))
                     {
-                        LineWriter.Line(result, "m_Connection = connection ?? throw new ArgumentNullException(nameof(connection));");
+                        code.Line("m_Connection = connection ?? throw new ArgumentNullException(nameof(connection));");
                     }
-                    LineWriter.LineSpace(result);
+                    code.LineSpace();
 
                     foreach (var p in protocolContents)
                     {
-                        using (var methodBlock = BlockWriter.Block(result, $"public void SEND_{direction}_{p.ProtocolName}({CodeGenParam.Concat(p.Parameters)})"))
+                        using (code.Scope($"public void SEND_{direction}_{p.ProtocolName}({CodeGenParam.Concat(p.Parameters)})"))
                         {
-                            LineWriter.Line(result, $"var packet = {packetPacker}.Pack_{direction}_{p.ProtocolName}({CodeGenParam.ConcatNames(p.Parameters)});");
-                            LineWriter.Line(result, $"m_Connection.Send(packet);");
+                            code.Line($"var packet = {packetPacker}.Pack_{direction}_{p.ProtocolName}({CodeGenParam.ConcatNames(p.Parameters)});");
+                            code.Line($"m_Connection.Send(packet);");
                         }
-                        LineWriter.LineSpace(result);
+                        code.LineSpace();
                     }
-
                 }
             }
-            return result;
+            return code;
         }
 
     }
