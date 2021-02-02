@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace CodeGenerator.Protocol
+namespace CodeGenerator
 {
     internal struct CodeGenParam
     {

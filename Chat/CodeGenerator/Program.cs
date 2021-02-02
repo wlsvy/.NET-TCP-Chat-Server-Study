@@ -1,4 +1,5 @@
-﻿using CodeGenerator.Protocol;
+﻿using CodeGenerator.Helper;
+using CodeGenerator.Protocol;
 using System;
 
 namespace CodeGenerator
@@ -9,7 +10,7 @@ namespace CodeGenerator
 
         static void Main(string[] args)
         {
-            Global.Initialize();
+            CodeGenUtil.Initialize();
 
             var docs = SchemaLoader.LoadXmlSchema("Schema");
 

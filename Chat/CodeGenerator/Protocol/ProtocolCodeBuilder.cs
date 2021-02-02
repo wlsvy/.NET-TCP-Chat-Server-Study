@@ -1,5 +1,4 @@
 ﻿using CodeGenerator.Helper;
-using CodeGenerator.Writer;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace CodeGenerator.Protocol
 
             foreach (var group in groups)
             {
-                result.Add(BuildPacketProtocol(group, group.Key));
+                result.Add(BuildPacketProtocolEnum(group, group.Key));
                 result.Add(BuildPacketHandlerInterface(group, group.Key));
                 result.Add(BuildPacketPacker(group, group.Key));
                 result.Add(BuildPacketProcessor(group, group.Key));
@@ -27,17 +26,18 @@ namespace CodeGenerator.Protocol
             return result;
         }
 
-        private static CodeGenContext BuildPacketProtocol(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
+        private static CodeGenContext BuildPacketProtocolEnum(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
-            var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
-            var newTypename = $"{direction}PacketProtocol";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
+            var packetProtocolEnum = $"{direction}PacketProtocol";
+
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{packetProtocolEnum}.g.cs");
 
             using (code.Scope($"namespace {directoryNamespace}"))
             {
-                using (code.Scope($"public enum {newTypename}: int"))
+                using (code.Scope($"public enum {packetProtocolEnum}: int"))
                 {
                     code.Line($"Invalid,");
                     code.LineSpace();
@@ -53,15 +53,16 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketHandlerInterface(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
-            var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
-            var newTypename = $"I{direction}PacketHandler";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
+            var packetHandlerInterface = $"I{direction}PacketHandler";
+
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{packetHandlerInterface}.g.cs");
 
             using (code.Scope($"namespace {directoryNamespace}"))
             {
-                using (code.Scope($"public interface {newTypename}"))
+                using (code.Scope($"public interface {packetHandlerInterface}"))
                 {
                     foreach (var p in protocolContents)
                     {
@@ -74,12 +75,13 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketPacker(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
-            var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
-            var newTypename = $"{direction}PacketPacker";
+
+            var packetPacker = $"{direction}PacketPacker";
             var protocolEnumType = $"{direction}PacketProtocol";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{packetPacker}.g.cs");
 
             code.Line($"using Shared.Network;");
             code.Line($"using Shared.Util;");
@@ -88,7 +90,7 @@ namespace CodeGenerator.Protocol
 
             using (code.Scope($"namespace {directoryNamespace}"))
             {
-                using (code.Scope($"public static class {newTypename}"))
+                using (code.Scope($"public static class {packetPacker}"))
                 {
                     using(code.Scope($"private static void WriteHeader(BinaryEncoder encoder, {protocolEnumType} protocol, int bodySize)"))
                     {
@@ -132,15 +134,15 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketProcessor(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
-            var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
 
-            var newTypename = $"{direction}PacketProcessor";
+            var packetProcessor = $"{direction}PacketProcessor";
             var packetHandlerInterface = $"I{direction}PacketHandler";
             var packetHeader = $"{direction}PacketHeader";
             var packetProtocol = $"{direction}PacketProtocol";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{packetProcessor}.g.cs");
 
             code.Line($"using Shared.Network;");
             code.Line($"using System;");
@@ -149,12 +151,12 @@ namespace CodeGenerator.Protocol
 
             using (code.Scope($"namespace {directoryNamespace}"))
             {
-            using (code.Scope($"public sealed class {newTypename} : PacketProcessorBase"))
+            using (code.Scope($"public sealed class {packetProcessor} : PacketProcessorBase"))
                 {
                     code.Line($"private readonly {packetHandlerInterface} m_PacketHandler;");
                     code.LineSpace();
 
-                    using (code.Scope($"public {newTypename}({packetHandlerInterface} handler)"))
+                    using (code.Scope($"public {packetProcessor}({packetHandlerInterface} handler)"))
                     {
                         code.Line("m_PacketHandler = handler ?? throw new ArgumentNullException(nameof(handler));");
                     }
@@ -273,13 +275,13 @@ namespace CodeGenerator.Protocol
 
         private static CodeGenContext BuildPacketSender(IEnumerable<ProtocolContent> protocolContents, ProtocolContent.ProtocolDirection direction)
         {
-            var protocolPath = Global.DIRECTORY_DIC[Global.Directories.Shared_Protocol];
+            var protocolPath = CodeGenUtil.DIRECTORY_DIC[CodeGenUtil.Directories.Shared_Protocol];
             var directoryNamespace = CodeGenUtil.GetNamespaceFromDirectory(protocolPath) ?? throw new DirectoryNotFoundException();
 
-            var newTypename = $"{direction}PacketSender";
+            var packetSender = $"{direction}PacketSender";
             var packetPacker = $"{direction}PacketPacker";
 
-            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{newTypename}.g.cs");
+            var code = new CodeGenContext(directoryPath: protocolPath, fileName: $"{packetSender}.g.cs");
 
             code.Line("using Shared.Network;");
             code.Line("using System;");
@@ -287,11 +289,11 @@ namespace CodeGenerator.Protocol
 
             using (code.Scope($"namespace {directoryNamespace}"))
             {
-                using (code.Scope($"public sealed class {newTypename}"))
+                using (code.Scope($"public sealed class {packetSender}"))
                 {
                     code.Line("private AsyncTcpConnection m_Connection;");
 
-                    using (code.Scope($"public {newTypename}(AsyncTcpConnection connection)"))
+                    using (code.Scope($"public {packetSender}(AsyncTcpConnection connection)"))
                     {
                         code.Line("m_Connection = connection ?? throw new ArgumentNullException(nameof(connection));");
                     }
@@ -310,6 +312,5 @@ namespace CodeGenerator.Protocol
             }
             return code;
         }
-
     }
 }
