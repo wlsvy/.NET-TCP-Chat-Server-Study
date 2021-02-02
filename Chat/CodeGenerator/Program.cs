@@ -10,12 +10,18 @@ namespace CodeGenerator
         {
             CodeGenUtil.Initialize();
 
-            var docs = SchemaLoader.LoadXmlSchema("Schema");
-            var protocolsContents = ProtocolContentParser.Parse(docs);
-            var codeGenContexts = ProtocolCodeBuilder.GenerateCode(protocolsContents);
-            CodeGenExporter.Export(codeGenContexts);
-
-            Console.WriteLine("코드젠 완료");
+            try
+            {
+                var docs = SchemaLoader.LoadXmlSchema("Schema");
+                var protocolsContents = ProtocolContentParser.Parse(docs);
+                var codeGenContexts = ProtocolCodeBuilder.GenerateCode(protocolsContents);
+                CodeGenExporter.Export(codeGenContexts);
+            }
+            catch(Exception e)
+            {
+                Environment.Exit(-1);
+            }
+            Environment.Exit(0);
         }
     }
 }
