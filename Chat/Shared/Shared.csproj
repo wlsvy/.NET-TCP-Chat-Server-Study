@@ -14,7 +14,7 @@
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
   </ItemGroup>
   
-    <ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="../Resources/Shaders/GLSL/imgui-vertex.glsl" LogicalName="imgui-vertex.glsl" Link="Gui\Shader\imgui-vertex.glsl" />
     <EmbeddedResource Include="../Resources/Shaders/GLSL/imgui-frag.glsl" LogicalName="imgui-frag.glsl" Link="Gui\Shader\imgui-frag.glsl" />
     <EmbeddedResource Include="../Resources/Shaders/HLSL/imgui-vertex.hlsl.bytes" LogicalName="imgui-vertex.hlsl.bytes" Link="Gui\Shader\imgui-vertex.hlsl.bytes" />

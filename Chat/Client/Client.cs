@@ -1,15 +1,13 @@
-﻿using Shared.Network;
+﻿using Client.Network;
+using Shared.Gui;
+using Shared.Logger;
+using Shared.Network;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
-using System.Collections.Generic;
-using Shared.Logger;
-using System.Threading.Tasks;
 using System.Threading;
-using Shared.Gui;
-using Client.Network;
-using Shared.Protocol;
-using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Client
 {
