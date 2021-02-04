@@ -19,8 +19,8 @@ namespace Server
         {
             m_Config = config;
             m_Timer = new Stopwatch();
-            m_ClientConnectionManager = new ClientConnectionManager(m_SessionManager);
             m_SessionManager = new SessionManager();
+            m_ClientConnectionManager = new ClientConnectionManager(m_SessionManager);
         }
 
         public void Start()

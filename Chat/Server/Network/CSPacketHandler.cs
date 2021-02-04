@@ -18,20 +18,20 @@ namespace Server.Network
 
         public void HANDLE_CS_Ping(long sequenceNumber)
         {
-            Log.I.Info($"Network Ping : {sequenceNumber}");
+            Log.I.Debug($"Network Ping : {sequenceNumber}");
             m_Connection.PacketSender.SEND_SC_Pong(sequenceNumber);
         }
 
         public void HANDLE_CS_Login(string id, string password)
         {
-            Log.I.Info($"id {id}, password {password}");
+            Log.I.Debug($"id {id}, password {password}");
             m_Connection.PacketSender.SEND_SC_Login(GlobalDataSource.I.Account.LoginAccount(id, password));
         }
 
         public void HANDLE_CS_CreateAccount(string id, string password)
         {
-            Log.I.Info($"id {id}, password {password}");
-            m_Connection.PacketSender.SEND_SC_Login(GlobalDataSource.I.Account.LoginAccount(id, password));
+            Log.I.Debug($"id {id}, password {password}");
+            m_Connection.PacketSender.SEND_SC_CreateAccount(GlobalDataSource.I.Account.CreateAccount(id, password));
         }
 
         public void HANDLE_CS_ChatMessage(string message)

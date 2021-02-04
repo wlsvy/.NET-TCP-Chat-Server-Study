@@ -6,12 +6,15 @@ using System.Net.Sockets;
 
 namespace Client.Network
 {
-    public sealed class ServerConnection : IDisposable
+    public sealed class ServerConnection : IDisposable, ISCPacketHandler
     {
         private readonly AsyncTcpConnection m_Connection;
         private readonly SCPacketProcessor m_PacketProcessor;
         private readonly CSPacketSender m_PacketSender;
         public CSPacketSender PacketSender => m_PacketSender;
+
+        private long m_AccountId = -1;
+        private bool IsLogin => m_AccountId != -1;
 
         private bool m_IsDisposed;
 
@@ -32,8 +35,7 @@ namespace Client.Network
                     Dispose();
                 },
                 onReceiveCompleted: () => Dispose());
-            var packetHandler = new SCPacketHandler();
-            m_PacketProcessor = new SCPacketProcessor(packetHandler);
+            m_PacketProcessor = new SCPacketProcessor(this);
             m_PacketSender = new CSPacketSender(m_Connection);
         }
 
@@ -74,5 +76,43 @@ namespace Client.Network
             }
             return totalConsumedByte;
         }
+
+        #region Packet Handler
+
+        public void HANDLE_SC_Pong(long sequenceNumber)
+        {
+            Log.I.Debug($"Network Pong : {sequenceNumber}");
+        }
+
+        public void HANDLE_SC_Login(long accountId)
+        {
+            if (accountId == -1)
+            {
+                Log.I.Debug($"로그인 실패");
+                return;
+            }
+
+            Log.I.Debug($"로그인 성공, AccountId : {accountId}");
+            m_AccountId = accountId;
+        }
+
+        public void HANDLE_SC_CreateAccount(long accountId)
+        {
+            if (accountId == -1)
+            {
+                Log.I.Debug($"계정 생성실패");
+                return;
+            }
+
+            Log.I.Debug($"계정 생성 성공, AccountId : {accountId}");
+            m_AccountId = accountId;
+        }
+
+        public void HANDLE_SC_ChatMessage()
+        {
+
+        }
+
+        #endregion
     }
 }
