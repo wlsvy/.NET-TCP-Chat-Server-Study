@@ -35,7 +35,10 @@ namespace Client.Gui
                     ClientGuiWindow.I.TryRemoveRenderer(popupWindow);
                 });
             };
-            AddImguiRenderer(popupWindow);
+            ClientJobManager.I.ReserveJob(async () =>
+            {
+                AddImguiRenderer(popupWindow);
+            });
         }
     }
 }

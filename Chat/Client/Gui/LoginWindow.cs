@@ -67,10 +67,7 @@ namespace Client.Gui
                 msg = "Login Account Success";
             }
 
-            ClientJobManager.I.ReserveJob(async () =>
-            {
-                ClientGuiWindow.I.CreatePopUp(msg);
-            });
+            ClientGuiWindow.I.CreatePopUp(msg);
         }
     }
 }
