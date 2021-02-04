@@ -2,6 +2,7 @@
 using ImGuiNET;
 using Shared.Gui;
 using Shared.Logger;
+using System;
 using System.Text;
 
 namespace Client.Gui
@@ -19,7 +20,7 @@ namespace Client.Gui
 
         void IImguiRenderer.Render()
         {
-            var windowFlag = ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
+            var windowFlag = ImGuiWindowFlags.NoResize;
             ImGui.Begin(WindowName, windowFlag);
 
             ImGui.Text("Login");
@@ -31,9 +32,11 @@ namespace Client.Gui
             ImGui.PushID("Login_Button");
             if (ImGui.Button("Login"))
             {
-                var id = Encoding.UTF8.GetString(m_IdBuffer).Trim();
-                var password = Encoding.UTF8.GetString(m_PasswordBuffer).Trim();
-                Log.I.Debug($"id : {id}, password : {password}");
+                var index = GetZeroIndex(m_IdBuffer);
+                var id = Encoding.UTF8.GetString(new ReadOnlySpan<byte>(m_IdBuffer, 0, index));
+                index = GetZeroIndex(m_PasswordBuffer);
+                var password = Encoding.UTF8.GetString(new ReadOnlySpan<byte>(m_PasswordBuffer, 0, index));
+                Log.I.Debug($"id : {id}:::END, password : {password}:::END");
 
                 ServerConnection.I.LoginEvent += OnLoginCallback;
                 ServerConnection.I.PacketSender.SEND_CS_Login(id, password);
@@ -52,6 +55,18 @@ namespace Client.Gui
             ImGui.PopID();
 
             ImGui.End();
+
+            int GetZeroIndex(byte[] arr)
+            {
+                for (int i = 0; i < MAX_INPUT_SIZE; i++)
+                {
+                    if(arr[i] == 0)
+                    {
+                        return i;
+                    }
+                }
+                return MAX_INPUT_SIZE;
+            }
         }
 
         private void OnLoginCallback(long accountId)
