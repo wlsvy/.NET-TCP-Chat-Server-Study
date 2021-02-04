@@ -18,8 +18,6 @@ namespace Client
         private readonly ClientConfig m_Config;
         private readonly Stopwatch m_Timer = new Stopwatch();
 
-        private ServerConnection m_ServerConnection;
-
         private long m_LinkedAccountId = 0;
         public long LinkedAccountId => m_LinkedAccountId;
 
@@ -54,7 +52,7 @@ namespace Client
                         return;
                     }
 
-                    m_ServerConnection = new ServerConnection(socket);
+                    ServerConnection.I.OnConnected(socket);
                     waitToConnect.SetResult(true);
                 },
                 initialData: null);
@@ -81,13 +79,15 @@ namespace Client
 
             timer.Start();
             ClientGuiWindow.I.Open();
-            ClientGuiWindow.I.AddImguiRenderer(new LoginWindow(m_ServerConnection));
+            ClientGuiWindow.I.AddImguiRenderer(new LoginWindow());
 
             while (true)
             {
                 var currentElapsedTime = timer.ElapsedMilliseconds;
                 var deltaTimeMSec = currentElapsedTime - elapsedTimeMSec;
                 elapsedTimeMSec = currentElapsedTime;
+
+                ClientJobManager.I.Update().Wait();
 
                 if (ClientGuiWindow.I.IsWindowExist)
                 {

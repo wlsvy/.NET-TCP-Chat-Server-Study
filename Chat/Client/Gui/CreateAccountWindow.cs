@@ -2,11 +2,7 @@
 using ImGuiNET;
 using Shared.Gui;
 using Shared.Logger;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Client.Gui
 {
@@ -17,13 +13,8 @@ namespace Client.Gui
         public string WindowName => "CreateAccount";
         private bool m_IsOpen;
         bool IImguiRenderer.IsOpen { get => m_IsOpen; set => m_IsOpen = value; }
-        private readonly ServerConnection m_Connection;
         private readonly byte[] m_IdBuffer = new byte[MAX_INPUT_SIZE];
         private readonly byte[] m_PasswordBuffer = new byte[MAX_INPUT_SIZE];
-        public CreateAccountWindow(ServerConnection connection)
-        {
-            m_Connection = connection;
-        }
 
         void IImguiRenderer.Render()
         {
@@ -36,12 +27,19 @@ namespace Client.Gui
             ImGui.PushID("CreateAccount_Button");
             if (ImGui.Button("CreateAccount"))
             {
-                var id = Encoding.UTF8.GetString(m_IdBuffer);
-                var password = Encoding.UTF8.GetString(m_PasswordBuffer);
+                var id = Encoding.UTF8.GetString(m_IdBuffer).Trim();
+                var password = Encoding.UTF8.GetString(m_PasswordBuffer).Trim();
                 Log.I.Debug($"id : {id}, password : {password}");
 
-                m_Connection.CreateAccountEvent += OnCreateAccountCallback;
-                m_Connection.PacketSender.SEND_CS_CreateAccount(id, password);
+                ServerConnection.I.CreateAccountEvent += OnCreateAccountCallback;
+                ServerConnection.I.PacketSender.SEND_CS_CreateAccount(id, password);
+            }
+            if (ImGui.Button("Cancel"))
+            {
+                ClientJobManager.I.ReserveJob(async () =>
+                {
+                    ClientGuiWindow.I.TryRemoveRenderer(this);
+                });
             }
             ImGui.PopID();
 
@@ -50,17 +48,23 @@ namespace Client.Gui
 
         private void OnCreateAccountCallback(long accountId)
         {
-            m_Connection.CreateAccountEvent -= OnCreateAccountCallback;
+            ServerConnection.I.CreateAccountEvent -= OnCreateAccountCallback;
 
+            string msg;
             if(accountId == -1)
             {
-                ClientGuiWindow.I.CreatePopUp("계정 생성 실패");
-                ClientGuiWindow.I.TryRemoveRenderer(this);
-                return;
+                msg = "계정 생성 실패";
+            }
+            else
+            {
+                msg = "계정 생성 성공";
             }
 
-            ClientGuiWindow.I.CreatePopUp("계정 생성 성공");
-            ClientGuiWindow.I.TryRemoveRenderer(this);
+            ClientJobManager.I.ReserveJob(async () =>
+            {
+                ClientGuiWindow.I.CreatePopUp(msg);
+                ClientGuiWindow.I.TryRemoveRenderer(this);
+            });
         }
     }
 }

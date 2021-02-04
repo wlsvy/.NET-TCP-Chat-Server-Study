@@ -1,16 +1,19 @@
 ﻿using Shared.Logger;
 using Shared.Network;
 using Shared.Protocol;
+using Shared.Util;
 using System;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Client.Network
 {
-    public sealed class ServerConnection : IDisposable, ISCPacketHandler
+    public sealed class ServerConnection : Singleton<ServerConnection>, IDisposable, ISCPacketHandler
     {
-        private readonly AsyncTcpConnection m_Connection;
-        private readonly SCPacketProcessor m_PacketProcessor;
-        private readonly CSPacketSender m_PacketSender;
+        private AsyncTcpConnection m_Connection;
+        private SCPacketProcessor m_PacketProcessor;
+        private CSPacketSender m_PacketSender;
         public CSPacketSender PacketSender => m_PacketSender;
 
         private long m_AccountId = -1;
@@ -18,7 +21,7 @@ namespace Client.Network
 
         private bool m_IsDisposed;
 
-        public ServerConnection(Socket tcpSocket)
+        public void OnConnected(Socket tcpSocket)
         {
             _ = tcpSocket ?? throw new ArgumentNullException(nameof(tcpSocket));
             if (tcpSocket.Connected == false)
@@ -38,6 +41,8 @@ namespace Client.Network
             m_PacketProcessor = new SCPacketProcessor(this);
             m_PacketSender = new CSPacketSender(m_Connection);
         }
+
+        
 
         public void Dispose()
         {
@@ -86,34 +91,40 @@ namespace Client.Network
 
         #region Packet Handler
 
-        public void HANDLE_SC_Pong(long sequenceNumber)
+        void ISCPacketHandler.HANDLE_SC_Pong(long sequenceNumber)
         {
             Log.I.Debug($"Network Pong : {sequenceNumber}");
         }
 
-        public void HANDLE_SC_Login(long accountId)
+        void ISCPacketHandler.HANDLE_SC_Login(long accountId)
         {
             if (accountId == -1)
             {
                 Log.I.Debug($"로그인 실패");
             }
 
-            m_AccountId = accountId;
-            LoginEvent?.Invoke(accountId);
+            ClientJobManager.I.ReserveJob(async () =>
+            {
+                m_AccountId = accountId;
+                LoginEvent?.Invoke(accountId);
+            });
         }
 
-        public void HANDLE_SC_CreateAccount(long accountId)
+        void ISCPacketHandler.HANDLE_SC_CreateAccount(long accountId)
         {
             if (accountId == -1)
             {
                 Log.I.Debug($"계정 생성실패");
             }
 
-            m_AccountId = accountId;
-            CreateAccountEvent?.Invoke(accountId);
+            ClientJobManager.I.ReserveJob(async () =>
+            {
+                m_AccountId = accountId;
+                CreateAccountEvent?.Invoke(accountId);
+            });
         }
 
-        public void HANDLE_SC_ChatMessage()
+        void ISCPacketHandler.HANDLE_SC_ChatMessage()
         {
 
         }
