@@ -1,4 +1,5 @@
-﻿using Client.Network;
+﻿using Client.Gui;
+using Client.Network;
 using Shared.Gui;
 using Shared.Logger;
 using Shared.Network;
@@ -81,7 +82,7 @@ namespace Client
 
             timer.Start();
             veldridWindow.Open();
-            veldridWindow.AddImguiRenderer(new ImguiDemoWindow());
+            veldridWindow.AddImguiRenderer(new LoginWindow());
 
             while (true)
             {

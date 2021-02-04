@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Shared.Gui
 {
-    public sealed class VeldridWindow : IDisposable
+    public class VeldridWindow : IDisposable
     {
         public bool IsWindowExist
         {
@@ -63,7 +63,7 @@ namespace Shared.Gui
 
         }
 
-        public void Update(int deltaMSec)
+        public virtual void Update(int deltaMSec)
         {
             OnRenderBegin(deltaMSec);
 

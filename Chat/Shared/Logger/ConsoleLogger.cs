@@ -31,8 +31,8 @@ namespace Shared.Logger
             bool lockTaken = false;
             m_Lock.Enter(ref lockTaken);
 
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine($"[Warning] {message}");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"[Debug] {message}");
             Console.ResetColor();
 
             m_Lock.Exit();

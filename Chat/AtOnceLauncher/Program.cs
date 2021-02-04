@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,7 +33,8 @@ Launcher Start
             var serverExecutable = Directory.GetFiles(serverProjectPath, "Server.exe", SearchOption.AllDirectories);
             var clientExecutable = Directory.GetFiles(clientProjectPath, "Client.exe", SearchOption.AllDirectories);
 
-            var serverProcess = Process.Start(serverExecutable[0]);
+            var serverProcess = Process.Start(serverExecutable.First());
+            var clientProcess = Process.Start(clientExecutable.First());
 
             var clientBotTasks = new List<Task>();
             var clientTaskCanceller = new CancellationTokenSource();
