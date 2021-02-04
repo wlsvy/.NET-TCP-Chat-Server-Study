@@ -115,11 +115,5 @@ namespace Client
                 Thread.Sleep(TimeSpan.FromSeconds(1000));
             }
         }
-
-
-        public void RequestLogin(string id, string password)
-        {
-
-        }
     }
 }

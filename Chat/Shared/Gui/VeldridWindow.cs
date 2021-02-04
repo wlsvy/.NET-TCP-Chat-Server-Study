@@ -2,6 +2,7 @@
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 using Shared.Util;
+using System.Linq;
 using System;
 using ImGuiNET;
 using Shared.Logger;
@@ -80,7 +81,41 @@ namespace Shared.Gui
         {
             m_UiRenderers.Add(renderer);
         }
+        public bool ContainRenderer<TRenderer>() where TRenderer : IImguiRenderer
+        {
+            foreach (var r in m_UiRenderers)
+            {
+                if (r is TRenderer target)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool TryGetRenderer<TRenderer>(out TRenderer renderer) where TRenderer : IImguiRenderer
+        {
+            foreach(var r in m_UiRenderers)
+            {
+                if(r is TRenderer target)
+                {
+                    renderer = target;
+                    return true;
+                }
+            }
+            renderer = default;
+            return false;
+        }
+        public bool TryRemoveRenderer(IImguiRenderer renderer)
+        {
+            var count = m_UiRenderers.Count;
+            m_UiRenderers.Remove(renderer);
 
+            if(m_UiRenderers.Count == count)
+            {
+                return false;
+            }
+            return true;
+        }
         public void ClearRenderers()
         {
             m_UiRenderers.Clear();

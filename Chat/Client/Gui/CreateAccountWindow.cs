@@ -40,11 +40,27 @@ namespace Client.Gui
                 var password = Encoding.UTF8.GetString(m_PasswordBuffer);
                 Log.I.Debug($"id : {id}, password : {password}");
 
+                m_Connection.CreateAccountEvent += OnCreateAccountCallback;
                 m_Connection.PacketSender.SEND_CS_CreateAccount(id, password);
             }
             ImGui.PopID();
 
             ImGui.End();
+        }
+
+        private void OnCreateAccountCallback(long accountId)
+        {
+            m_Connection.CreateAccountEvent -= OnCreateAccountCallback;
+
+            if(accountId == -1)
+            {
+                ClientGuiWindow.I.CreatePopUp("계정 생성 실패");
+                ClientGuiWindow.I.TryRemoveRenderer(this);
+                return;
+            }
+
+            ClientGuiWindow.I.CreatePopUp("계정 생성 성공");
+            ClientGuiWindow.I.TryRemoveRenderer(this);
         }
     }
 }

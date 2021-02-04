@@ -77,6 +77,13 @@ namespace Client.Network
             return totalConsumedByte;
         }
 
+        #region PacketHandler Callback
+
+        public event Action<long> LoginEvent;
+        public event Action<long> CreateAccountEvent;
+
+        #endregion
+
         #region Packet Handler
 
         public void HANDLE_SC_Pong(long sequenceNumber)
@@ -89,11 +96,10 @@ namespace Client.Network
             if (accountId == -1)
             {
                 Log.I.Debug($"로그인 실패");
-                return;
             }
 
-            Log.I.Debug($"로그인 성공, AccountId : {accountId}");
             m_AccountId = accountId;
+            LoginEvent?.Invoke(accountId);
         }
 
         public void HANDLE_SC_CreateAccount(long accountId)
@@ -101,11 +107,10 @@ namespace Client.Network
             if (accountId == -1)
             {
                 Log.I.Debug($"계정 생성실패");
-                return;
             }
 
-            Log.I.Debug($"계정 생성 성공, AccountId : {accountId}");
             m_AccountId = accountId;
+            CreateAccountEvent?.Invoke(accountId);
         }
 
         public void HANDLE_SC_ChatMessage()

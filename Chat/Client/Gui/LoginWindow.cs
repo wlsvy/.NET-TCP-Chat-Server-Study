@@ -45,7 +45,10 @@ namespace Client.Gui
             ImGui.SameLine();
             if(ImGui.Button("Create Account"))
             {
-                m_CreateAccountPopup = true;
+                if (!ClientGuiWindow.I.ContainRenderer<CreateAccountWindow>())
+                {
+                    ClientGuiWindow.I.AddImguiRenderer(new CreateAccountWindow(m_Connection));
+                }
             }
             ImGui.PopID();
 
