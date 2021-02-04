@@ -13,7 +13,7 @@ namespace Shared.Gui
         private static IdGenerator s_IdGenerator = new IdGenerator(startNumber: 0);
 
         public event Action OnClose;
-        private bool m_IsOpen;
+        private bool m_IsOpen = true;
         string IImguiRenderer.WindowName => "ImguiDemo";
         bool IImguiRenderer.IsOpen { get => m_IsOpen; set => m_IsOpen = value; }
         private readonly long m_Id;

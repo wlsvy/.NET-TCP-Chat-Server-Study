@@ -10,7 +10,7 @@ namespace Client.Gui
     public sealed class CreateAccountWindow : IImguiRenderer
     {
         public string WindowName => "CreateAccount";
-        private bool m_IsOpen;
+        private bool m_IsOpen = true;
         bool IImguiRenderer.IsOpen { get => m_IsOpen; set => m_IsOpen = value; }
         private readonly byte[] m_IdBuffer = new byte[Util.MAX_INPUT_BUFFER_SIZE];
         private readonly byte[] m_PasswordBuffer = new byte[Util.MAX_INPUT_BUFFER_SIZE];

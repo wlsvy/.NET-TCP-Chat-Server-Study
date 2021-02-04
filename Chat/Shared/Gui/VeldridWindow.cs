@@ -72,7 +72,10 @@ namespace Shared.Gui
             RenderMainMenuBar();
             foreach (var renderer in m_UiRenderers)
             {
-                renderer.Render();
+                if (renderer.IsOpen)
+                {
+                    renderer.Render();
+                }
             }
             Submit();
         }
@@ -94,9 +97,9 @@ namespace Shared.Gui
         }
         public bool TryGetRenderer<TRenderer>(out TRenderer renderer) where TRenderer : IImguiRenderer
         {
-            foreach(var r in m_UiRenderers)
+            foreach (var r in m_UiRenderers)
             {
-                if(r is TRenderer target)
+                if (r is TRenderer target)
                 {
                     renderer = target;
                     return true;
@@ -110,7 +113,7 @@ namespace Shared.Gui
             var count = m_UiRenderers.Count;
             m_UiRenderers.Remove(renderer);
 
-            if(m_UiRenderers.Count == count)
+            if (m_UiRenderers.Count == count)
             {
                 return false;
             }
