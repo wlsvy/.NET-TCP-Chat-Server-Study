@@ -4,8 +4,7 @@ namespace Shared.Logger
 {
     public interface ILogger
     {
-        void Info(string message);
-        void Warn(string message);
-        void Error(string caption, Exception exception);
+        void Log(LogLevel level, string message);
+        void Log(LogLevel level, string message, Exception exception);
     }
 }

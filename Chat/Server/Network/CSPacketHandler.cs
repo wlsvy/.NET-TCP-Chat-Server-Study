@@ -1,4 +1,5 @@
-﻿using Shared.Logger;
+﻿using Server.DataSource;
+using Shared.Logger;
 using Shared.Protocol;
 using System;
 
@@ -18,16 +19,19 @@ namespace Server.Network
         public void HANDLE_CS_Ping(long sequenceNumber)
         {
             Log.I.Info($"Network Ping : {sequenceNumber}");
+            m_Connection.PacketSender.SEND_SC_Pong(sequenceNumber);
         }
 
         public void HANDLE_CS_Login(string id, string password)
         {
             Log.I.Info($"id {id}, password {password}");
+            m_Connection.PacketSender.SEND_SC_Login(GlobalDataSource.I.Account.LoginAccount(id, password));
         }
 
         public void HANDLE_CS_CreateAccount(string id, string password)
         {
             Log.I.Info($"id {id}, password {password}");
+            m_Connection.PacketSender.SEND_SC_Login(GlobalDataSource.I.Account.LoginAccount(id, password));
         }
 
         public void HANDLE_CS_ChatMessage(string message)

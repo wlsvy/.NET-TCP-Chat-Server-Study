@@ -36,7 +36,7 @@ namespace Server.Network
                 },
                 onReceiveCompleted: () => Dispose());
 
-            var packeHandler = new CSPacketHandler();
+            var packeHandler = new CSPacketHandler(this, sessionManager);
             m_PacketProcessor = new CSPacketProcessor(packeHandler);
             m_PacketSender = new SCPacketSender(m_Connection);
         }

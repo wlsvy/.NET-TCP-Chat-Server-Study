@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Threading;
 using Shared.Gui;
 using Shared.Logger;
+using Server.DataSource;
 
 namespace Server
 {
@@ -43,10 +44,12 @@ namespace Server
         private static void InitializeSingleton()
         {
             Log.I.Initialize();
+            GlobalDataSource.I.Initialize();
         }
 
         private static void DestroySingleton()
         {
+            GlobalDataSource.I.Destroy();
             Log.I.Destroy();
         }
 

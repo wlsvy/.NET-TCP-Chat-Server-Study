@@ -4,7 +4,15 @@ using System.Collections.Generic;
 
 namespace Shared.Logger
 {
-    public class Log : Singleton<Log>, ILogger
+    public enum LogLevel
+    {
+        Debug,
+        Info,
+        Warn,
+        Error,
+    }
+
+    public class Log : Singleton<Log>
     {
         private List<ILogger> m_Loggers;
 
@@ -16,11 +24,19 @@ namespace Shared.Logger
             };
         }
 
+        public void Debug(string message)
+        {
+            foreach(var logger in m_Loggers)
+            {
+                logger.Log(LogLevel.Debug, message);
+            }
+        }
+
         public void Warn(string message)
         {
             foreach(var logger in m_Loggers)
             {
-                logger.Warn(message);
+                logger.Log(LogLevel.Warn, message);
             }
         }
 
@@ -28,7 +44,7 @@ namespace Shared.Logger
         {
             foreach (var logger in m_Loggers)
             {
-                logger.Error(caption, exception);
+                logger.Log(LogLevel.Error, caption, exception);
             }
         }
 
@@ -36,7 +52,7 @@ namespace Shared.Logger
         {
             foreach (var logger in m_Loggers)
             {
-                logger.Info(message);
+                logger.Log(LogLevel.Info, message);
             }
         }
 
