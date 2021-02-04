@@ -25,10 +25,6 @@
     <EmbeddedResource Include="../Resources/Shaders/Metal/imgui-frag.metallib" LogicalName="imgui-frag.metallib" Link="Gui\Shader\imgui-frag.metallib" />
   </ItemGroup>
   
-  <ItemGroup>
-    <Folder Include="Gui\Shader\" />
-  </ItemGroup>
-  
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="cd $(SolutionDir)CodeGenerator\$(OutDir)&#xD;&#xA;&quot;CodeGenerator.exe&quot;&#xD;&#xA;" />
   </Target>
