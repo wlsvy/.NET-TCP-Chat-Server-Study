@@ -15,7 +15,6 @@ namespace Client.Gui
         bool IImguiRenderer.IsOpen { get => m_IsOpen; set => m_IsOpen = value; }
         private readonly byte[] m_IdBuffer = new byte[Util.MAX_INPUT_BUFFER_SIZE];
         private readonly byte[] m_PasswordBuffer = new byte[Util.MAX_INPUT_BUFFER_SIZE];
-        private bool m_CreateAccountPopup;
 
         void IImguiRenderer.Render()
         {
@@ -57,12 +56,6 @@ namespace Client.Gui
         private void OnLoginCallback(long accountId)
         {
             ServerConnection.I.LoginEvent -= OnLoginCallback;
-
-        }
-
-        private void OnCreateAccountCallback(long accountId)
-        {
-            ServerConnection.I.CreateAccountEvent -= OnCreateAccountCallback;
 
             string msg;
             if (accountId == -1)

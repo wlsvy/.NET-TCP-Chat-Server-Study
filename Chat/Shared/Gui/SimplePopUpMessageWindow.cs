@@ -37,8 +37,8 @@ namespace Shared.Gui
 
         void IImguiRenderer.Render()
         {
-            ImGui.PushID($"SimplePopUp-{m_Id}");
-            ImGui.Begin("popupMessage", ImGuiWindowFlags.NoTitleBar);
+            ImGui.Begin($"popupMessage {m_Id}", ImGuiWindowFlags.NoTitleBar);
+            ImGui.PushID(m_Id.ToString());
 
             ImGui.Text(m_Message);
             if (ImGui.Button($"Ok"))
@@ -53,8 +53,8 @@ namespace Shared.Gui
                 OnClose?.Invoke();
             }
 
-            ImGui.End();
             ImGui.PopID();
+            ImGui.End();
         }
     }
 }
