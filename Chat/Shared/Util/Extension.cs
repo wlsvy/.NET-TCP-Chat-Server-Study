@@ -44,23 +44,23 @@ namespace Shared.Util
 
         public static void Write(this BinaryEncoder encoder, in CSPacketProtocol value)
         {
-            byte underlyingValue = (byte)value;
+            int underlyingValue = (int)value;
             encoder.Write(in underlyingValue);
         }
         public static int Read(this BinaryDecoder decoder, out CSPacketProtocol value)
         {
-            var consumedBytes = decoder.Read(out byte underlyingValue);
+            var consumedBytes = decoder.Read(out int underlyingValue);
             value = (CSPacketProtocol)underlyingValue;
             return consumedBytes;
         }
         public static void Write(this BinaryEncoder encoder, in SCPacketProtocol value)
         {
-            byte underlyingValue = (byte)value;
+            int underlyingValue = (int)value;
             encoder.Write(in underlyingValue);
         }
         public static int Read(this BinaryDecoder decoder, out SCPacketProtocol value)
         {
-            var consumedBytes = decoder.Read(out byte underlyingValue);
+            var consumedBytes = decoder.Read(out int underlyingValue);
             value = (SCPacketProtocol)underlyingValue;
             return consumedBytes;
         }

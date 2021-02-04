@@ -30,7 +30,10 @@ namespace Client.Gui
         {
             popupWindow.OnClose += () =>
             {
-                ClientGuiWindow.I.TryRemoveRenderer(popupWindow);
+                ClientJobManager.I.ReserveJob(async () =>
+                {
+                    ClientGuiWindow.I.TryRemoveRenderer(popupWindow);
+                });
             };
             AddImguiRenderer(popupWindow);
         }

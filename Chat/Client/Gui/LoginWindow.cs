@@ -3,19 +3,18 @@ using ImGuiNET;
 using Shared.Gui;
 using Shared.Logger;
 using System;
+using Client.Utils;
 using System.Text;
 
 namespace Client.Gui
 {
     public sealed class LoginWindow : IImguiRenderer
     {
-        private const int MAX_INPUT_SIZE = 32;
-
         public string WindowName => "Login";
         private bool m_IsOpen;
         bool IImguiRenderer.IsOpen { get => m_IsOpen; set => m_IsOpen = value; }
-        private readonly byte[] m_IdBuffer = new byte[MAX_INPUT_SIZE];
-        private readonly byte[] m_PasswordBuffer = new byte[MAX_INPUT_SIZE];
+        private readonly byte[] m_IdBuffer = new byte[Util.MAX_INPUT_BUFFER_SIZE];
+        private readonly byte[] m_PasswordBuffer = new byte[Util.MAX_INPUT_BUFFER_SIZE];
         private bool m_CreateAccountPopup;
 
         void IImguiRenderer.Render()
@@ -26,17 +25,15 @@ namespace Client.Gui
             ImGui.Text("Login");
 
 
-            ImGui.InputText("ID", m_IdBuffer, MAX_INPUT_SIZE);
-            ImGui.InputText("PW", m_PasswordBuffer, MAX_INPUT_SIZE, ImGuiInputTextFlags.Password);
+            ImGui.InputText("ID", m_IdBuffer, Util.MAX_INPUT_BUFFER_SIZE);
+            ImGui.InputText("PW", m_PasswordBuffer, Util.MAX_INPUT_BUFFER_SIZE, ImGuiInputTextFlags.Password);
 
             ImGui.PushID("Login_Button");
             if (ImGui.Button("Login"))
             {
-                var index = GetZeroIndex(m_IdBuffer);
-                var id = Encoding.UTF8.GetString(new ReadOnlySpan<byte>(m_IdBuffer, 0, index));
-                index = GetZeroIndex(m_PasswordBuffer);
-                var password = Encoding.UTF8.GetString(new ReadOnlySpan<byte>(m_PasswordBuffer, 0, index));
-                Log.I.Debug($"id : {id}:::END, password : {password}:::END");
+                var id = Util.GetImGuiInputText(m_IdBuffer);
+                var password = Util.GetImGuiInputText(m_PasswordBuffer);
+                Log.I.Debug($"id : {id}, password : {password}");
 
                 ServerConnection.I.LoginEvent += OnLoginCallback;
                 ServerConnection.I.PacketSender.SEND_CS_Login(id, password);
@@ -55,18 +52,6 @@ namespace Client.Gui
             ImGui.PopID();
 
             ImGui.End();
-
-            int GetZeroIndex(byte[] arr)
-            {
-                for (int i = 0; i < MAX_INPUT_SIZE; i++)
-                {
-                    if(arr[i] == 0)
-                    {
-                        return i;
-                    }
-                }
-                return MAX_INPUT_SIZE;
-            }
         }
 
         private void OnLoginCallback(long accountId)
@@ -82,11 +67,11 @@ namespace Client.Gui
             string msg;
             if (accountId == -1)
             {
-                msg = "로그인 실패";
+                msg = "Login Account Fail";
             }
             else
             {
-                msg = "로그인 성공";
+                msg = "Login Account Success";
             }
 
             ClientJobManager.I.ReserveJob(async () =>
