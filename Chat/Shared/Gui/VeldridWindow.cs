@@ -1,6 +1,7 @@
 ﻿using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
+using Shared.Util;
 using System;
 using ImGuiNET;
 using Shared.Logger;
@@ -8,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Shared.Gui
 {
-    public class VeldridWindow : IDisposable
+    public abstract class VeldridWindow<T> : Singleton<T> where T : class, new()
     {
         public bool IsWindowExist
         {
@@ -58,7 +59,7 @@ namespace Shared.Gui
             catch (Exception e)
             {
                 Log.I.Error("Veldrid Window 열기 실패", e);
-                Dispose();
+                Destroy();
             }
 
         }
@@ -85,8 +86,10 @@ namespace Shared.Gui
             m_UiRenderers.Clear();
         }
 
-        public void Dispose()
+        public override void Destroy()
         {
+            base.Destroy();
+
             if (m_IsDisposed)
             {
                 return;

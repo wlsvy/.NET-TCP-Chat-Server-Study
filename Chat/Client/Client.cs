@@ -77,12 +77,11 @@ namespace Client
         {
             var timeSlicePerUpdateMSec = m_Config.TimeSlicePerUpdateMSec;
             var timer = new Stopwatch();
-            var veldridWindow = new VeldridWindow();
             var elapsedTimeMSec = 0L;
 
             timer.Start();
-            veldridWindow.Open();
-            veldridWindow.AddImguiRenderer(new LoginWindow());
+            ClientGuiWindow.I.Open();
+            ClientGuiWindow.I.AddImguiRenderer(new LoginWindow(m_ServerConnection));
 
             while (true)
             {
@@ -90,9 +89,9 @@ namespace Client
                 var deltaTimeMSec = currentElapsedTime - elapsedTimeMSec;
                 elapsedTimeMSec = currentElapsedTime;
 
-                if (veldridWindow.IsWindowExist)
+                if (ClientGuiWindow.I.IsWindowExist)
                 {
-                    veldridWindow.Update((int)deltaTimeMSec);
+                    ClientGuiWindow.I.Update((int)deltaTimeMSec);
                 }
                 else
                 {
@@ -106,7 +105,7 @@ namespace Client
                     Thread.Sleep((int)sleepTime);
                 }
             }
-            veldridWindow.Dispose();
+            ClientGuiWindow.I.Destroy();
         }
 
         public void RunLoop(CancellationTokenSource cts)

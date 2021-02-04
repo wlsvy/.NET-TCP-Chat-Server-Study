@@ -7,6 +7,7 @@ using System.Threading;
 using Shared.Gui;
 using Shared.Logger;
 using Server.DataSource;
+using Server.Gui;
 
 namespace Server
 {
@@ -56,12 +57,11 @@ namespace Server
         private static void RunMainThreadLoop(int timeSlicePerUpdateMSec)
         {
             var timer = new Stopwatch();
-            var veldridWindow = new VeldridWindow();
             var elapsedTimeMSec = 0L;
 
             timer.Start();
-            veldridWindow.Open();
-            veldridWindow.AddImguiRenderer(new ImguiDemoWindow());
+            ServerGuiWindow.I.Open();
+            ServerGuiWindow.I.AddImguiRenderer(new ImguiDemoWindow());
 
             while (true)
             {
@@ -69,9 +69,9 @@ namespace Server
                 var deltaTimeMSec = currentElapsedTime - elapsedTimeMSec;
                 elapsedTimeMSec = currentElapsedTime;
 
-                if (veldridWindow.IsWindowExist)
+                if (ServerGuiWindow.I.IsWindowExist)
                 {
-                    veldridWindow.Update((int)deltaTimeMSec);
+                    ServerGuiWindow.I.Update((int)deltaTimeMSec);
                 }
                 else
                 {
@@ -86,7 +86,7 @@ namespace Server
                 }
             }
 
-            veldridWindow.Dispose();
+            ServerGuiWindow.I.Destroy();
         }
     }
 }
