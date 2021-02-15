@@ -42,7 +42,7 @@ namespace Client
                     TimeSpan.FromSeconds(1),
                     TimeSpan.FromSeconds(1),
                 }),
-                onCompleted: (isSuccess, socket, initialiData) =>
+                onCompleted: (isSuccess, socket) =>
                 {
                     isConnected = isSuccess;
                     if (!isConnected)
@@ -54,8 +54,7 @@ namespace Client
 
                     ServerConnection.I.OnConnected(socket);
                     waitToConnect.SetResult(true);
-                },
-                initialData: null);
+                });
 
             waitToConnect.Task.Wait();
             return isConnected;

@@ -155,7 +155,7 @@ namespace ServerTest
                     ip: ip,
                     port: port,
                     leftTimeoutList: new Queue<TimeSpan>(timeout),
-                    onCompleted: (bool isConnected, Socket newSocket, object initialData) =>
+                    onCompleted: (bool isConnected, Socket newSocket) =>
                     {
                         Assert.IsTrue(isConnected, "연결 실패");
 
@@ -164,8 +164,7 @@ namespace ServerTest
                             onReceived: data => throw new Exception("메세지 파싱"),
                             onError: error => isExceptionTerminated = true,
                             onReceiveCompleted: () => Assert.Fail("실패"));   //정상적으로 메세지 수신 시 테스트 실패
-                    },
-                    initialData: null);
+                    });
 
             await TestHelper.BecomeTrue(() =>
             {
@@ -266,7 +265,7 @@ namespace ServerTest
                     TimeSpan.FromMilliseconds(100),
                     TimeSpan.FromMilliseconds(100),
                     TimeSpan.FromMilliseconds(100) }),
-                onCompleted: (isConnected, socket, initialData) =>
+                onCompleted: (isConnected, socket) =>
                 {
                     Assert.IsTrue(isConnected);
                     Assert.IsNotNull(socket);
@@ -275,8 +274,7 @@ namespace ServerTest
                     Assert.IsNotNull(newStream);
 
                     isDone.Set();
-                },
-                initialData: null);
+                });
 
             Assert.IsTrue(isDone.WaitOne(TimeSpan.FromSeconds(5)));
             isDone.Reset();
@@ -298,7 +296,7 @@ namespace ServerTest
                     TimeSpan.FromMilliseconds(100),
                     TimeSpan.FromMilliseconds(100),
                     TimeSpan.FromMilliseconds(100) }),
-                onCompleted: (isConnected, socket, initialData) =>
+                onCompleted: (isConnected, socket) =>
                 {
                     Assert.IsTrue(isConnected);
                     Assert.IsNotNull(socket);
@@ -307,8 +305,7 @@ namespace ServerTest
                     Assert.IsNotNull(newStream);
 
                     isDone.Set();
-                },
-                initialData: null);
+                });
             }
 
             BecomeTrue(() =>
@@ -379,7 +376,7 @@ namespace ServerTest
                     ip: ip, 
                     port: port, 
                     leftTimeoutList: timeout,
-                    onCompleted: (bool isConnected, Socket socket, object initialData) =>
+                    onCompleted: (bool isConnected, Socket socket) =>
                     {
                         Assert.IsTrue(isConnected);
 
@@ -407,8 +404,7 @@ namespace ServerTest
                                 },
                                 onError: error => onClosed(),
                                 onReceiveCompleted: onClosed);
-                    }, 
-                    initialData: null);
+                    });
             }
 
             while (csStreams.Count() < numberOfConnections ||

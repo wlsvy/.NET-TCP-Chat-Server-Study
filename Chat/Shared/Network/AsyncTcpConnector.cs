@@ -11,15 +11,15 @@ namespace Shared.Network
 {
     public static class AsyncTcpConnector
     {
-        public static void Connect(IPAddress ip, int port, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket, object> onCompleted, object initialData)
+        public static void Connect(IPAddress ip, int port, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket> onCompleted)
         {
             _ = ip ?? throw new ArgumentNullException(nameof(ip));
 
             var remoteEndPoint = new IPEndPoint(ip, port);
-            DoTryConnect(remoteEndPoint, leftTimeoutList, onCompleted, initialData);
+            DoTryConnect(remoteEndPoint, leftTimeoutList, onCompleted);
         }
 
-        private static void DoTryConnect(EndPoint remoteEndPoint, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket, object> onCompleted, object initialData)
+        private static void DoTryConnect(EndPoint remoteEndPoint, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket> onCompleted)
         {
             _ = remoteEndPoint ?? throw new ArgumentNullException(nameof(remoteEndPoint));
             _ = leftTimeoutList ?? throw new ArgumentNullException(nameof(leftTimeoutList));
@@ -28,7 +28,7 @@ namespace Shared.Network
             if (leftTimeoutList.IsEmpty())
             {
                 Log.I.Info("접속 최종 실패");
-                onCompleted(false, null, null);
+                onCompleted(false, null);
                 return;
             }
 
@@ -36,7 +36,7 @@ namespace Shared.Network
             var nextTimeout = leftTimeoutList.Dequeue();
 
             var socket = new Socket(remoteEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            var connectContextData = new ConnectionContextData(socket, leftTimeoutList, onCompleted, initialData);
+            var connectContextData = new ConnectionContextData(socket, leftTimeoutList, onCompleted);
             var args = new SocketAsyncEventArgs();
             args.RemoteEndPoint = remoteEndPoint;
             args.Completed += OnConnect;
@@ -59,14 +59,14 @@ namespace Shared.Network
                         data.ConnectedSocket.Close();
                         Log.I.Info($"타임아웃으로 접속 실패. 잠시 후 접속 재시도");
 
-                        DoTryConnect(remoteEndPoint, data.LeftTimeoutList, data.OnCompleted, initialData);
+                        DoTryConnect(remoteEndPoint, data.LeftTimeoutList, data.OnCompleted);
                     });
                 }
             }
             catch (Exception e)
             {
                 Log.I.Error($"{nameof(AsyncTcpConnector)}.{nameof(DoTryConnect)} 접속 중 오류 발생, 잠시 후 접속 재시도", e);
-                DoTryConnect(remoteEndPoint, leftTimeoutList, onCompleted, initialData);
+                DoTryConnect(remoteEndPoint, leftTimeoutList, onCompleted);
                 DisposeConnectionArgs(args);
             }
         }
@@ -91,13 +91,13 @@ namespace Shared.Network
             if(args.SocketError != SocketError.Success)
             {
                 Log.I.Warn($"접속 실패");
-                DoTryConnect(args.RemoteEndPoint, connectContextData.LeftTimeoutList, connectContextData.OnCompleted, connectContextData.InitialData);
+                DoTryConnect(args.RemoteEndPoint, connectContextData.LeftTimeoutList, connectContextData.OnCompleted);
                 DisposeConnectionArgs(args);
                 return;
             }
 
             Log.I.Info("TCP 접속 성공");
-            connectContextData.OnCompleted(true, connectContextData.ConnectedSocket, connectContextData.InitialData);
+            connectContextData.OnCompleted(true, connectContextData.ConnectedSocket);
             DisposeConnectionArgs(args);
         }
 
@@ -111,9 +111,8 @@ namespace Shared.Network
         private class ConnectionContextData : IDisposable
         {
             public readonly Socket ConnectedSocket;
-            public readonly Action<bool, Socket, object> OnCompleted;
+            public readonly Action<bool, Socket> OnCompleted;
             public readonly Queue<TimeSpan> LeftTimeoutList;
-            public readonly object InitialData;
 
             private Task m_ConnectTimeoutTask;
             private readonly CancellationTokenSource m_CancelToken = new CancellationTokenSource();
@@ -121,12 +120,11 @@ namespace Shared.Network
             private bool m_IsCompleted;
             private bool m_IsDispoed;
 
-            public ConnectionContextData(Socket socket, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket, object> onCompleted, object initialData)
+            public ConnectionContextData(Socket socket, Queue<TimeSpan> leftTimeoutList, Action<bool, Socket> onCompleted)
             {
                 ConnectedSocket = socket ?? throw new ArgumentNullException(nameof(socket));
                 OnCompleted = onCompleted ?? throw new ArgumentNullException(nameof(onCompleted));
                 LeftTimeoutList = leftTimeoutList ?? throw new ArgumentNullException(nameof(leftTimeoutList));
-                InitialData = initialData;
             }
 
             public void Dispose() 
