@@ -14,6 +14,15 @@ namespace Client.Gui
         {
             ImGui.SetNextWindowSize(new Vector2(800, 600), ImGuiCond.FirstUseEver);
             ImGui.Begin("Lobby");
+
+            var guiWindowSize = ImGui.GetContentRegionMax();
+            var guiWidth = guiWindowSize.X;
+            var guiHeight = guiWindowSize.Y;
+
+            ImGui.BeginChildFrame((uint)"Chatting Room List".GetHashCode(), new Vector2(guiWidth * 0.9f, guiHeight * 0.7f));
+
+            ImGui.EndChildFrame();
+            ImGui.NewLine();
             if (ImGui.Button("Logout"))
             {
                 ClientGui.I.RemoveGui(this);
