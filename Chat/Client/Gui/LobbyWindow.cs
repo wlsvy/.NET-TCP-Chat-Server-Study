@@ -16,8 +16,9 @@ namespace Client.Gui
             ImGui.Begin("Lobby");
             if (ImGui.Button("Logout"))
             {
-                ClientGui.I.VeldridWindow.TryRemoveRenderer(this);
-                ClientGui.I.VeldridWindow.AddImguiRenderer(new LoginWindow());
+                ClientGui.I.RemoveGui(this);
+                ClientGui.I.CreatePopUp("Logout", 
+                    onOk: () => ClientGui.I.AddGuiIfNotExist<LoginWindow>());
             }
 
             ImGui.End();

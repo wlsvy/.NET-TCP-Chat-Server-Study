@@ -1,5 +1,6 @@
 ﻿using Client.Gui;
 using Client.Network;
+using Shared.Gui;
 using Shared.Logger;
 using Shared.Network;
 using System;
@@ -75,9 +76,12 @@ namespace Client
             var timer = new Stopwatch();
             var elapsedTimeMSec = 0L;
 
+            var veldridWindow = new VeldridWindow();
+            veldridWindow.Open("Simple Chat Client");
+            veldridWindow.AddImguiRenderer(new LoginWindow());
+            ClientGui.I.Initialize(veldridWindow);
+
             timer.Start();
-            ClientGui.I.VeldridWindow.Open("Simple Chat Client");
-            ClientGui.I.VeldridWindow.AddImguiRenderer(new LoginWindow());
 
             while (true)
             {
@@ -87,9 +91,9 @@ namespace Client
 
                 ClientJobManager.I.Update().Wait();
 
-                if (ClientGui.I.VeldridWindow.IsWindowExist)
+                if (veldridWindow.IsWindowExist)
                 {
-                    ClientGui.I.VeldridWindow.Update((int)deltaTimeMSec);
+                    veldridWindow.Update((int)deltaTimeMSec);
                 }
                 else
                 {

@@ -6,10 +6,54 @@ namespace Client.Gui
 {
     internal sealed class ClientGui : Singleton<ClientGui>
     {
-        public VeldridWindow VeldridWindow { get; }
-        public ClientGui()
+        private VeldridWindow m_VeldridWindow;
+
+        public void Initialize(VeldridWindow window)
         {
-            VeldridWindow = new VeldridWindow();
+            m_VeldridWindow = window;
+        }
+
+        public bool Contain<TGuiRenderer>() where TGuiRenderer : IImguiRenderer
+        {
+            return m_VeldridWindow.ContainRenderer<TGuiRenderer>();
+        }
+
+        public void AddGui(IImguiRenderer renderer)
+        {
+            ClientJobManager.I.ReserveJob(async () =>
+            {
+                m_VeldridWindow.AddImguiRenderer(renderer);
+            });
+        }
+
+        public void AddGuiIfNotExist(IImguiRenderer renderer)
+        {
+            ClientJobManager.I.ReserveJob(async () =>
+            {
+                if (!m_VeldridWindow.ContainRenderer(renderer))
+                {
+                    m_VeldridWindow.AddImguiRenderer(renderer);
+                }
+            });
+        }
+
+        public void AddGuiIfNotExist<TGuiRenderer>() where TGuiRenderer : class, IImguiRenderer, new()
+        {
+            ClientJobManager.I.ReserveJob(async () =>
+            {
+                if (!m_VeldridWindow.ContainRenderer<TGuiRenderer>())
+                {
+                    m_VeldridWindow.AddImguiRenderer(new TGuiRenderer());
+                }
+            });
+        }
+
+        public void RemoveGui(IImguiRenderer renderer)
+        {
+            ClientJobManager.I.ReserveJob(async () =>
+            {
+                m_VeldridWindow.TryRemoveRenderer(renderer);
+            });
         }
 
         public void CreatePopUp(string message)
@@ -31,7 +75,7 @@ namespace Client.Gui
         public override void Destroy()
         {
             base.Destroy();
-            VeldridWindow.Dispose();
+            m_VeldridWindow.Dispose();
         }
 
         private void DoCreateWindow(SimplePopUpMessageWindow popupWindow)
@@ -40,13 +84,10 @@ namespace Client.Gui
             {
                 ClientJobManager.I.ReserveJob(async () =>
                 {
-                    VeldridWindow.TryRemoveRenderer(popupWindow);
+                    m_VeldridWindow.TryRemoveRenderer(popupWindow);
                 });
             };
-            ClientJobManager.I.ReserveJob(async () =>
-            {
-                VeldridWindow.AddImguiRenderer(popupWindow);
-            });
+            AddGui(popupWindow);
         }
 
         

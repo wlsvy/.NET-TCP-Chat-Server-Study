@@ -93,6 +93,17 @@ namespace Shared.Gui
             }
             return false;
         }
+        public bool ContainRenderer(IImguiRenderer renderer)
+        {
+            foreach (var r in m_UiRenderers)
+            {
+                if (r == renderer)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public bool TryGetRenderer<TRenderer>(out TRenderer renderer) where TRenderer : IImguiRenderer
         {
             foreach (var r in m_UiRenderers)

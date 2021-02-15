@@ -40,13 +40,7 @@ namespace Client.Gui
             ImGui.SameLine();
             if(ImGui.Button("Create Account"))
             {
-                ClientJobManager.I.ReserveJob(async () =>
-                {
-                    if (!ClientGui.I.VeldridWindow.ContainRenderer<CreateAccountWindow>())
-                    {
-                        ClientGui.I.VeldridWindow.AddImguiRenderer(new CreateAccountWindow());
-                    }
-                });
+                ClientGui.I.AddGuiIfNotExist<CreateAccountWindow>();
             }
             ImGui.PopID();
 
@@ -57,19 +51,17 @@ namespace Client.Gui
         {
             ServerConnection.I.LoginEvent -= OnLoginCallback;
 
-            string msg;
             if (accountId == -1)
             {
-                msg = "Login Account Fail";
+                ClientGui.I.CreatePopUp("Login Account Fail");
+
             }
             else
             {
-                msg = "Login Account Success";
-                ClientGui.I.VeldridWindow.TryRemoveRenderer(this);
-                ClientGui.I.VeldridWindow.AddImguiRenderer(new LobbyWindow());
+                ClientGui.I.RemoveGui(this);
+                ClientGui.I.CreatePopUp("Login Account Success",
+                    onOk: () => ClientGui.I.AddGuiIfNotExist<LobbyWindow>());
             }
-
-            ClientGui.I.CreatePopUp(msg);
         }
     }
 }
