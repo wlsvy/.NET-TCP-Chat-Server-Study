@@ -3,11 +3,10 @@ using Client.Utils;
 using ImGuiNET;
 using Shared.Gui;
 using Shared.Logger;
-using System.Text;
 
 namespace Client.Gui
 {
-    public sealed class CreateAccountWindow : IImguiRenderer
+    internal sealed class CreateAccountWindow : IImguiRenderer
     {
         public string WindowName => "CreateAccount";
         private bool m_IsOpen = true;

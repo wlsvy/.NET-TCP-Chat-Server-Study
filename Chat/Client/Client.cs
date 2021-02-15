@@ -1,6 +1,5 @@
 ﻿using Client.Gui;
 using Client.Network;
-using Shared.Gui;
 using Shared.Logger;
 using Shared.Network;
 using System;

@@ -3,6 +3,7 @@ using Client.Utils;
 using ImGuiNET;
 using Shared.Gui;
 using Shared.Logger;
+using System.Numerics;
 
 namespace Client.Gui
 {
@@ -17,6 +18,7 @@ namespace Client.Gui
         void IImguiRenderer.Render()
         {
             var windowFlag = ImGuiWindowFlags.NoResize;
+            ImGui.SetNextWindowSize(new Vector2(512, 128), ImGuiCond.FirstUseEver);
             ImGui.Begin(WindowName, windowFlag);
 
             ImGui.Text("Login");
@@ -63,6 +65,8 @@ namespace Client.Gui
             else
             {
                 msg = "Login Account Success";
+                ClientGui.I.VeldridWindow.TryRemoveRenderer(this);
+                ClientGui.I.VeldridWindow.AddImguiRenderer(new LobbyWindow());
             }
 
             ClientGui.I.CreatePopUp(msg);
