@@ -222,7 +222,7 @@ namespace Shared.Network
 
         private void CloseSocketWhileReceiving(SocketAsyncEventArgs args, Exception exception)
         {
-            Log.I.Info($"{nameof(AsyncTcpConnection)}.{nameof(CloseSocketWhileReceiving)} Close Socket! with error");
+            Log.I.Warn($"{nameof(AsyncTcpConnection)}.{nameof(CloseSocketWhileReceiving)} Close Socket! with error");
 
             m_Receiving.TryDispose();
             if(args.UserToken is ReceiveContextData receiveCtx)

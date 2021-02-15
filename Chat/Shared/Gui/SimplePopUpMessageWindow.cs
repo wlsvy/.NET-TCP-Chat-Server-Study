@@ -1,10 +1,7 @@
 ﻿using ImGuiNET;
 using Shared.Util;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 
 namespace Shared.Gui
 {
@@ -37,10 +34,12 @@ namespace Shared.Gui
 
         void IImguiRenderer.Render()
         {
+            ImGui.SetNextWindowSize(new Vector2(256, 64));
             ImGui.Begin($"popupMessage {m_Id}", ImGuiWindowFlags.NoTitleBar);
             ImGui.PushID(m_Id.ToString());
 
             ImGui.Text(m_Message);
+            ImGui.NewLine();
             if (ImGui.Button($"Ok"))
             {
                 m_OkCallback?.Invoke();

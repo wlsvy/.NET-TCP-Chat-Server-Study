@@ -60,7 +60,7 @@ namespace Server
             var elapsedTimeMSec = 0L;
 
             timer.Start();
-            ServerGui.I.VeldridWindow.Open();
+            ServerGui.I.VeldridWindow.Open("Simple Chat Server");
             ServerGui.I.VeldridWindow.AddImguiRenderer(new ImguiDemoWindow());
 
             while (true)

@@ -38,8 +38,8 @@ Launcher Start
 
             var clientBotTasks = new List<Task>();
             var clientTaskCanceller = new CancellationTokenSource();
-            const int ClientCount = 5;
-            for(int i = 0; i < ClientCount; i++)
+            const int clientCount = 5;
+            for(int i = 0; i < clientCount; i++)
             {
                 var task = Task.Run(() => Client.Program.Main_Bot(clientTaskCanceller));
                 clientBotTasks.Add(task);

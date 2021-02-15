@@ -1,10 +1,8 @@
 ﻿using Client.Network;
+using Client.Utils;
 using ImGuiNET;
 using Shared.Gui;
 using Shared.Logger;
-using System;
-using Client.Utils;
-using System.Text;
 
 namespace Client.Gui
 {

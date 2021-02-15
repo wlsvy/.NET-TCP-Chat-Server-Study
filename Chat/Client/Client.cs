@@ -78,7 +78,7 @@ namespace Client
             var elapsedTimeMSec = 0L;
 
             timer.Start();
-            ClientGui.I.VeldridWindow.Open();
+            ClientGui.I.VeldridWindow.Open("Simple Chat Client");
             ClientGui.I.VeldridWindow.AddImguiRenderer(new LoginWindow());
 
             while (true)

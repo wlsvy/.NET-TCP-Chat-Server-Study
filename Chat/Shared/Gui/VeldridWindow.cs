@@ -31,7 +31,7 @@ namespace Shared.Gui
 
         private bool m_IsDisposed = false;
 
-        public void Open()
+        public void Open(string windowName)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace Shared.Gui
                     (int)GuiUtil.WINDOW_INITAL_SIZE.X,
                     (int)GuiUtil.WINDOW_INITAL_SIZE.Y,
                     WindowState.Normal,
-                    "ImGui.NET Sample Program"),
+                    windowName),
                 new GraphicsDeviceOptions(true, null, true, ResourceBindingModel.Improved, true, true),
                 out m_Window,
                 out m_GraphicsDevice);
