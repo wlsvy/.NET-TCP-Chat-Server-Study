@@ -14,7 +14,7 @@ namespace Shared.Gui
 
         public event Action OnClose;
         private bool m_IsOpen = true;
-        string IImguiRenderer.WindowName => "ImguiDemo";
+        string IImguiRenderer.WindowName => "Pop_Up";
         bool IImguiRenderer.IsOpen { get => m_IsOpen; set => m_IsOpen = value; }
         private readonly long m_Id;
         private string m_Message;

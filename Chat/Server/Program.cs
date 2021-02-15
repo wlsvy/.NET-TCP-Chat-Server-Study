@@ -60,8 +60,8 @@ namespace Server
             var elapsedTimeMSec = 0L;
 
             timer.Start();
-            ServerGuiWindow.I.Open();
-            ServerGuiWindow.I.AddImguiRenderer(new ImguiDemoWindow());
+            ServerGui.I.VeldridWindow.Open();
+            ServerGui.I.VeldridWindow.AddImguiRenderer(new ImguiDemoWindow());
 
             while (true)
             {
@@ -69,9 +69,9 @@ namespace Server
                 var deltaTimeMSec = currentElapsedTime - elapsedTimeMSec;
                 elapsedTimeMSec = currentElapsedTime;
 
-                if (ServerGuiWindow.I.IsWindowExist)
+                if (ServerGui.I.VeldridWindow.IsWindowExist)
                 {
-                    ServerGuiWindow.I.Update((int)deltaTimeMSec);
+                    ServerGui.I.VeldridWindow.Update((int)deltaTimeMSec);
                 }
                 else
                 {
@@ -86,7 +86,7 @@ namespace Server
                 }
             }
 
-            ServerGuiWindow.I.Destroy();
+            ServerGui.I.Destroy();
         }
     }
 }

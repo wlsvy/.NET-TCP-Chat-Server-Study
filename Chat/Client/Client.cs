@@ -78,8 +78,8 @@ namespace Client
             var elapsedTimeMSec = 0L;
 
             timer.Start();
-            ClientGuiWindow.I.Open();
-            ClientGuiWindow.I.AddImguiRenderer(new LoginWindow());
+            ClientGui.I.VeldridWindow.Open();
+            ClientGui.I.VeldridWindow.AddImguiRenderer(new LoginWindow());
 
             while (true)
             {
@@ -89,9 +89,9 @@ namespace Client
 
                 ClientJobManager.I.Update().Wait();
 
-                if (ClientGuiWindow.I.IsWindowExist)
+                if (ClientGui.I.VeldridWindow.IsWindowExist)
                 {
-                    ClientGuiWindow.I.Update((int)deltaTimeMSec);
+                    ClientGui.I.VeldridWindow.Update((int)deltaTimeMSec);
                 }
                 else
                 {
@@ -105,7 +105,7 @@ namespace Client
                     Thread.Sleep((int)sleepTime);
                 }
             }
-            ClientGuiWindow.I.Destroy();
+            ClientGui.I.Destroy();
         }
 
         public void RunLoop(CancellationTokenSource cts)

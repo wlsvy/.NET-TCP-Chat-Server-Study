@@ -42,9 +42,9 @@ namespace Client.Gui
             {
                 ClientJobManager.I.ReserveJob(async () =>
                 {
-                    if (!ClientGuiWindow.I.ContainRenderer<CreateAccountWindow>())
+                    if (!ClientGui.I.ContainRenderer<CreateAccountWindow>())
                     {
-                        ClientGuiWindow.I.AddImguiRenderer(new CreateAccountWindow());
+                        ClientGui.I.AddImguiRenderer(new CreateAccountWindow());
                     }
                 });
             }
@@ -67,7 +67,7 @@ namespace Client.Gui
                 msg = "Login Account Success";
             }
 
-            ClientGuiWindow.I.CreatePopUp(msg);
+            ClientGui.I.CreatePopUp(msg);
         }
     }
 }

@@ -1,16 +1,17 @@
 ﻿using Shared.Gui;
 using Shared.Util;
-using Shared.Logger;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client.Gui
 {
-    public sealed class ClientGuiWindow : VeldridWindow<ClientGuiWindow>
+    internal sealed class ClientGui : Singleton<ClientGui>
     {
+        public VeldridWindow VeldridWindow { get; }
+        public ClientGui()
+        {
+            VeldridWindow = new VeldridWindow();
+        }
+
         public void CreatePopUp(string message)
         {
             var popupWindow = new SimplePopUpMessageWindow(message);
@@ -26,19 +27,28 @@ namespace Client.Gui
             var popupWindow = new SimplePopUpMessageWindow(message, onOk, onCancel);
             DoCreateWindow(popupWindow);
         }
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            VeldridWindow.Dispose();
+        }
+
         private void DoCreateWindow(SimplePopUpMessageWindow popupWindow)
         {
             popupWindow.OnClose += () =>
             {
                 ClientJobManager.I.ReserveJob(async () =>
                 {
-                    ClientGuiWindow.I.TryRemoveRenderer(popupWindow);
+                    VeldridWindow.TryRemoveRenderer(popupWindow);
                 });
             };
             ClientJobManager.I.ReserveJob(async () =>
             {
-                AddImguiRenderer(popupWindow);
+                VeldridWindow.AddImguiRenderer(popupWindow);
             });
         }
+
+        
     }
 }
