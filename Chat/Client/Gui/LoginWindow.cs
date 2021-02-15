@@ -42,9 +42,9 @@ namespace Client.Gui
             {
                 ClientJobManager.I.ReserveJob(async () =>
                 {
-                    if (!ClientGui.I.ContainRenderer<CreateAccountWindow>())
+                    if (!ClientGui.I.VeldridWindow.ContainRenderer<CreateAccountWindow>())
                     {
-                        ClientGui.I.AddImguiRenderer(new CreateAccountWindow());
+                        ClientGui.I.VeldridWindow.AddImguiRenderer(new CreateAccountWindow());
                     }
                 });
             }

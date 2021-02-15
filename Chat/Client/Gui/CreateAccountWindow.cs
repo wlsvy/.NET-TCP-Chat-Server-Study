@@ -37,7 +37,7 @@ namespace Client.Gui
             {
                 ClientJobManager.I.ReserveJob(async () =>
                 {
-                    ClientGui.I.TryRemoveRenderer(this);
+                    ClientGui.I.VeldridWindow.TryRemoveRenderer(this);
                 });
             }
             ImGui.PopID();
@@ -62,7 +62,7 @@ namespace Client.Gui
             ClientJobManager.I.ReserveJob(async () =>
             {
                 ClientGui.I.CreatePopUp(msg);
-                ClientGui.I.TryRemoveRenderer(this);
+                ClientGui.I.VeldridWindow.TryRemoveRenderer(this);
             });
         }
     }
